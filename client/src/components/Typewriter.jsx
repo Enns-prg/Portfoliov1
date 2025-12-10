@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
-const Typewriter = ({ text, delay = 100, onComplete }) => {
+const Typewriter = ({ 
+  text, 
+  delay = 100, 
+  onComplete,
+  // Added className prop with default styles for the main title
+  className = "font-mono text-2xl sm:text-4xl md:text-6xl font-bold text-white tracking-tight"
+}) => {
   const [currentText, setCurrentText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -18,7 +24,7 @@ const Typewriter = ({ text, delay = 100, onComplete }) => {
   }, [currentIndex, delay, text, onComplete]);
 
   return (
-    <span className="font-mono text-4xl md:text-6xl font-bold text-white tracking-tight">
+    <span className={className}>
       {currentText}
       <span className="animate-pulse text-yellow-400">|</span>
     </span>

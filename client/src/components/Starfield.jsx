@@ -10,7 +10,7 @@ const Starfield = () => {
   texture.wrapT = THREE.RepeatWrapping;
   
   // Try (16, 16) or even (20, 20) to match your reference image
-  texture.repeat.set(16, 16); 
+  texture.repeat.set(20, 20); 
 
   return (
     <mesh>
