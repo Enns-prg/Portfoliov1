@@ -6,6 +6,38 @@ import Planet from './components/Planet';
 import Orbit from './components/Orbit';
 import Typewriter from './components/Typewriter';
 
+// --- SUN DETAIL VIEW ---
+const SunDetailView = ({ onClose }) => (
+  <div className="w-screen h-screen bg-black text-white flex items-center justify-between px-20">
+    {/* Left Side - Text */}
+    <div className="max-w-md">
+      <h2 className="text-4xl font-bold mb-8">MY PICTURE</h2>
+      <h3 className="text-3xl font-bold mb-8">ABOUT ME</h3>
+      <p className="text-xl leading-relaxed text-gray-300">THE CONTEXT OF ABOUT ME</p>
+    </div>
+
+    {/* Right Side - 3D Model */}
+    <div className="flex-1 flex items-center justify-center">
+      <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+        <Suspense fallback={null}>
+          <Starfield />
+          <Planet name="Sun" scale={5} rotationSpeed={0.01} />
+        </Suspense>
+        <pointLight position={[5, 5, 5]} intensity={1} />
+        <ambientLight intensity={0.5} />
+      </Canvas>
+    </div>
+
+    {/* Close Button */}
+    <button
+      onClick={onClose}
+      className="absolute top-8 right-8 text-white text-3xl font-bold hover:text-yellow-400 transition"
+    >
+      ✕
+    </button>
+  </div>
+);
+
 // --- MAIN PORTFOLIO CONTENT ---
 const MainPortfolio = () => (
   <div className="w-screen h-screen bg-neutral-900 text-white flex flex-col items-center justify-center">
@@ -50,7 +82,7 @@ const LandingOverlay = ({ onEnter }) => {
         >
           <span className="absolute inset-0 w-full h-full bg-yellow-400 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></span>
           <span className="relative z-10 flex items-center gap-2">
-            ENTER UNIVERSE 
+            ABOUT ME 
             <span className="text-lg">→</span>
           </span>
         </button>
@@ -61,6 +93,9 @@ const LandingOverlay = ({ onEnter }) => {
 
 function App() {
   const [entered, setEntered] = useState(false);
+  const [sunClicked, setSunClicked] = useState(false);
+
+  if (sunClicked) return <SunDetailView onClose={() => setSunClicked(false)} />;
 
   if (entered) return <MainPortfolio />;
 
@@ -79,7 +114,12 @@ function App() {
 
         <Suspense fallback={null}>
           <Starfield />
-          <Planet name="Sun" scale={3} rotationSpeed={0.002} />
+          <Planet 
+            name="Sun" 
+            scale={3} 
+            rotationSpeed={0.002}
+            onPlanetClick={() => setSunClicked(true)}
+          />
           
           {planets.map((planet, index) => (
             <group key={index}>

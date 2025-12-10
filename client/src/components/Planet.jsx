@@ -28,7 +28,7 @@ const Planet = ({
   const spinSpeed = useRef(rotationSpeed);
 
   useEffect(() => {
-    // --- MATERIAL SETUP (Keep your existing Sun/Shadow logic) ---
+
     sceneClone.traverse((child) => {
       if (child.isMesh) {
         if (name === 'Sun') {
@@ -38,7 +38,7 @@ const Planet = ({
            const context = canvas.getContext('2d');
            const gradient = context.createLinearGradient(0, 0, 0, 128);
            gradient.addColorStop(0, '#ffcc00');   
-           gradient.addColorStop(0.5, '#ff5500'); 
+           gradient.addColorStop(0.5, '#ce8f08ff'); 
            gradient.addColorStop(1, '#ff5500');   
            context.fillStyle = gradient;
            context.fillRect(0, 0, 128, 128);
@@ -47,11 +47,11 @@ const Planet = ({
            child.material = new THREE.MeshStandardMaterial({
             map: gradientTexture,
             flatShading: true,
-            roughness: 1,
-            metalness: 0,
+            roughness: 3,
+            metalness: 1,
             emissive: 0xffaa00,
             emissiveMap: gradientTexture,
-            emissiveIntensity: 0.5
+            emissiveIntensity: 0.75
           });
         } else {
             child.castShadow = true;
@@ -65,7 +65,7 @@ const Planet = ({
     if (planetRef.current) {
       // 1. ROTATION (Self)
       // If clicked, spin fast, otherwise normal speed
-      const targetSpeed = isSpinning ? 0.1 : rotationSpeed;
+      const targetSpeed = isSpinning ? 0.2 : rotationSpeed;
       // Smoothly interpolate current speed to target speed
       spinSpeed.current = THREE.MathUtils.lerp(spinSpeed.current, targetSpeed, 0.1);
       planetRef.current.rotation.y += spinSpeed.current;
