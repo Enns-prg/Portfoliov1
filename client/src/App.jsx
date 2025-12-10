@@ -51,14 +51,12 @@ const HeroSection = () => {
 // --- CONTENT SECTIONS ---
 const AboutMeContent = () => (
   <Section align="left">
-    {/* Added 'ml-32' to move the whole block slightly to center */}
-    <div className="w-[45%] ml-32 p-8 bg-black/40  border-white/10 rounded-2xl text-white">
+    {/* Card styles removed. Added 'mt-[-5rem]' to layout. */}
+    <div className="w-[45%] text-white mt-[-5rem] z-10">
       
       {/* --- IMAGE CODE --- */}
       <div className="relative mb-8 group">
-        {/* Glow Effect */}
-<div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-full opacity-30 blur-md group-hover:opacity-70 transition duration-500"></div>        {/* The Image */}
-        <img 
+<div className="absolute -inset-1 bg-gradient-to-br from-yellow-400 via-transparent to-red-400 rounded-full opacity-50 blur-sm animate-spin [animation-duration:3s] group-hover:opacity-80 transition duration-500"></div>        <img 
           src="/assets/images/me.jpg" 
           alt="Frederick Ian Aranico" 
           className="relative w-48 h-48 rounded-full border-2 border-yellow-100/50 object-cover shadow-2xl"
@@ -119,13 +117,13 @@ const HeroSolarSystem = () => {
   });
 
   return (
-    <group ref={solarSystemRef} position={[5, 2, 0]}>
+    <group ref={solarSystemRef} position={[5, -2, 0]}>
       <Planet name="Sun" scale={3} rotationSpeed={0.002} />
       <group>
         <Orbit radius={5} />   <Planet name="Mercury" scale={6} orbitRadius={5} orbitSpeed={1} />
-        <Orbit radius={7.5} /> <Planet name="Venus" scale={9} orbitRadius={7.5} orbitSpeed={0.6} />
-        <Orbit radius={11} />  <Planet name="Earth" scale={0.15} orbitRadius={11} orbitSpeed={0.3} />
-        <Orbit radius={14} />  <Planet name="Mars" scale={6} orbitRadius={14} orbitSpeed={0.5} />
+        <Orbit radius={7} /> <Planet name="Venus" scale={9} orbitRadius={7} orbitSpeed={0.6} />
+        <Orbit radius={10} />  <Planet name="Earth" scale={0.15} orbitRadius={10} orbitSpeed={0.4} />
+        <Orbit radius={12.5} />  <Planet name="Mars" scale={6} orbitRadius={12.5} orbitSpeed={0.3} />
       </group>
     </group>
   );
@@ -136,9 +134,8 @@ const ContentPlanets = () => {
   const { viewport } = useThree();
   const scroll = useScroll(); 
   const groupRef = useRef();
- 
   
-  const xOffset = viewport.width / 8.5; 
+  const xOffset = viewport.width / 10; 
 
   const planets = useMemo(() => [
     { name: "Mercury", scale: 54, position: [xOffset, -viewport.height * 1, 0] },
