@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -13,20 +13,25 @@ const Planet = ({
   orbitRadius = 0,  
   initialPosition = [0, 0, 0],
   yOffset = 0,
-  isPaused = false,         // NEW: Stops orbit if true
-  onPlanetClick = () => {}  // NEW: Function to run when clicked
 }) => {
   const { scene } = useGLTF(`/assets/models/${name}.glb`);
   const planetRef = useRef();
-
+  
+  // Clone scene to allow multiple instances (if needed)
   const sceneClone = useMemo(() => SkeletonUtils.clone(scene), [scene]);
+  
+  // Orbit state
   const offset = useRef(startAngle);
+  
+  // Interaction State
+  const [isSpinning, setIsSpinning] = useState(false);
+  const spinSpeed = useRef(rotationSpeed);
 
   useEffect(() => {
+    // --- MATERIAL SETUP (Keep your existing Sun/Shadow logic) ---
     sceneClone.traverse((child) => {
       if (child.isMesh) {
         if (name === 'Sun') {
-          // --- SUN SETUP ---
            child.geometry = new THREE.IcosahedronGeometry(1, 1);
            const canvas = document.createElement('canvas');
            canvas.width = 128; canvas.height = 128;
@@ -49,7 +54,6 @@ const Planet = ({
             emissiveIntensity: 0.5
           });
         } else {
-            // --- PLANET SETUP ---
             child.castShadow = true;
             child.receiveShadow = true;
         }
@@ -59,11 +63,16 @@ const Planet = ({
 
   useFrame(({ clock }) => {
     if (planetRef.current) {
-      // Always rotate the planet itself (Day/Night cycle)
-      planetRef.current.rotation.y += rotationSpeed;
+      // 1. ROTATION (Self)
+      // If clicked, spin fast, otherwise normal speed
+      const targetSpeed = isSpinning ? 0.1 : rotationSpeed;
+      // Smoothly interpolate current speed to target speed
+      spinSpeed.current = THREE.MathUtils.lerp(spinSpeed.current, targetSpeed, 0.1);
+      planetRef.current.rotation.y += spinSpeed.current;
 
-      // ONLY Orbit if NOT paused
-      if (orbitRadius > 0 && !isPaused) {
+      // 2. ORBIT (Around Sun)
+      // Continuous orbit, never pauses
+      if (orbitRadius > 0) {
         const t = clock.getElapsedTime() * orbitSpeed + offset.current;
         const x = Math.cos(t) * orbitRadius;
         const z = Math.sin(t) * orbitRadius;
@@ -72,19 +81,22 @@ const Planet = ({
     }
   });
 
+  const handleInteract = (e) => {
+    e.stopPropagation();
+    // Trigger "Spin Boost"
+    setIsSpinning(true);
+    // Stop spinning after 1 second
+    setTimeout(() => setIsSpinning(false), 1000);
+  };
+
   return (
     <primitive 
       ref={planetRef}
       object={sceneClone} 
       position={initialPosition} 
       scale={scale} 
-      // NEW: Handle Click
-      onClick={(e) => {
-        e.stopPropagation(); // Stop click from passing through
-        onPlanetClick(name, planetRef.current.position); // Tell App we were clicked
-      }}
-      // Change cursor to hand when hovering
-      onPointerOver={() => document.body.style.cursor = 'pointer'}
+      onClick={handleInteract}
+      onPointerOver={() => document.body.style.cursor = 'grab'}
       onPointerOut={() => document.body.style.cursor = 'auto'}
     />
   );
