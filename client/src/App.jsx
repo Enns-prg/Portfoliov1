@@ -8,15 +8,19 @@ import Orbit from './components/Orbit';
 import Typewriter from './components/Typewriter';
 
 // --- HTML SECTIONS ---
+// Added pointer-events-none to container so it doesn't block 3D, 
+// but re-enabled it for children so buttons work.
 const Section = ({ align = 'left', justify = 'center', children }) => (
-  <div className={`h-screen w-screen flex flex-col px-20 relative ${
+  <div className={`h-screen w-screen flex flex-col px-20 relative pointer-events-none ${
     align === 'right' ? 'items-end' : 
     align === 'left' ? 'items-start' : 'items-center'
   } ${
     justify === 'center' ? 'justify-center' : 
     justify === 'start' ? 'justify-start' : 'justify-end'
   }`}>
-    {children}
+    <div className="pointer-events-auto">
+      {children}
+    </div>
   </div>
 );
 
@@ -51,12 +55,12 @@ const HeroSection = () => {
 // --- CONTENT SECTIONS ---
 const AboutMeContent = () => (
   <Section align="left">
-    {/* Card styles removed. Added 'mt-[-5rem]' to layout. */}
     <div className="w-[45%] text-white mt-[-5rem] z-10">
       
-      {/* --- IMAGE CODE --- */}
+      {/* --- IMAGE --- */}
       <div className="relative mb-8 group">
-<div className="absolute -inset-1 bg-gradient-to-br from-yellow-400 via-transparent to-red-400 rounded-full opacity-50 blur-sm animate-spin [animation-duration:3s] group-hover:opacity-80 transition duration-500"></div>        <img 
+        <div className="absolute -inset-1 bg-gradient-to-br from-yellow-400 via-transparent to-red-400 rounded-full opacity-50 blur-sm animate-spin [animation-duration:3s] group-hover:opacity-80 transition duration-500"></div>
+        <img 
           src="/assets/images/me.jpg" 
           alt="Frederick Ian Aranico" 
           className="relative w-48 h-48 rounded-full border-2 border-yellow-100/50 object-cover shadow-2xl"
@@ -64,9 +68,38 @@ const AboutMeContent = () => (
       </div>
 
       <h3 className="text-3xl font-bold mb-6">ABOUT ME</h3>
-      <p className="text-xl leading-relaxed text-gray-300 text-justify" style={{ textAlign: 'justify' }}>
+      <p className="text-xl leading-relaxed text-gray-300 text-justify mb-8" style={{ textAlign: 'justify' }}>
        Hi! I’m Frederick Ian Aranico, a Computer Science student and aspiring AI engineer with a strong focus on building practical, data-driven, and AI-powered applications. I enjoy working across the full stack—developing backend systems, crafting intuitive interfaces, and integrating machine learning models that solve real-world problems.
       </p>
+
+      {/* --- SOCIAL LINKS (ADDED HERE) --- */}
+      <div className="flex gap-4">
+        <a 
+          href="/resume.pdf" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="px-6 py-2 border border-yellow-400 text-yellow-400 rounded-full hover:bg-yellow-400 hover:text-black transition-all duration-300 font-bold tracking-wider text-sm flex items-center gap-2"
+        >
+          <span>📄</span> RESUME
+        </a>
+        <a 
+          href="https://github.com/yourusername" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="px-6 py-2 border border-white/30 text-white rounded-full hover:bg-white hover:text-black transition-all duration-300 text-sm flex items-center gap-2"
+        >
+          <span>💻</span> GITHUB
+        </a>
+        <a 
+          href="https://linkedin.com/in/yourname" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="px-6 py-2 border border-white/30 text-white rounded-full hover:bg-blue-600 hover:border-blue-600 hover:text-white transition-all duration-300 text-sm flex items-center gap-2"
+        >
+          <span>🔗</span> LINKEDIN
+        </a>
+      </div>
+
     </div>
   </Section>
 );
@@ -91,7 +124,6 @@ const CameraRig = () => {
     const transitionPhase = THREE.MathUtils.clamp(scrollOffset * 3, 0, 1);
     
     const startPos = new THREE.Vector3(0, 20, 25);
-    // End position y=0 ensures we look straight at the content (not from above)
     const endPos = new THREE.Vector3(0, 13, 20); 
     
     state.camera.position.lerpVectors(startPos, endPos, transitionPhase);
@@ -121,9 +153,9 @@ const HeroSolarSystem = () => {
       <Planet name="Sun" scale={3} rotationSpeed={0.002} />
       <group>
         <Orbit radius={5} />   <Planet name="Mercury" scale={6} orbitRadius={5} orbitSpeed={1} />
-        <Orbit radius={7} /> <Planet name="Venus" scale={9} orbitRadius={7} orbitSpeed={0.6} />
+        <Orbit radius={7} />   <Planet name="Venus" scale={9} orbitRadius={7} orbitSpeed={0.6} />
         <Orbit radius={10} />  <Planet name="Earth" scale={0.15} orbitRadius={10} orbitSpeed={0.4} />
-        <Orbit radius={12.5} />  <Planet name="Mars" scale={6} orbitRadius={12.5} orbitSpeed={0.3} />
+        <Orbit radius={12.5} /> <Planet name="Mars" scale={6} orbitRadius={12.5} orbitSpeed={0.3} />
       </group>
     </group>
   );
@@ -154,7 +186,6 @@ const ContentPlanets = () => {
   });
 
   return (
-    // scale={[0,0,0]} fixes the "flash" issue on load
     <group ref={groupRef} scale={[0, 0, 0]}>
       {planets.map((p, i) => (
         <group key={i} position={p.position}>

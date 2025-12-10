@@ -13,6 +13,7 @@ const Planet = ({
   orbitRadius = 0,  
   initialPosition = [0, 0, 0],
   yOffset = 0,
+  onPlanetClick,
 }) => {
   const { scene } = useGLTF(`/assets/models/${name}.glb`);
   const planetRef = useRef();
@@ -64,6 +65,8 @@ const Planet = ({
     setIsSpinning(true);
     // Stop spinning after 1 second
     setTimeout(() => setIsSpinning(false), 1000);
+    // Forward click event to parent (for scrolling or other behavior)
+    if (onPlanetClick) onPlanetClick();
   };
 
   return (
