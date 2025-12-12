@@ -7,30 +7,37 @@ import Planet from './components/Planet';
 import Orbit from './components/Orbit';
 import Typewriter from './components/Typewriter';
 
-// --- SOUND MANAGER COMPONENT ---
-// Handles the ambient background loop
+// --- 1. SOUND MANAGER (Refined for "Play Right Away") ---
 const SoundManager = () => {
   useEffect(() => {
-    // Create the audio object
+    //
     const audio = new Audio('/assets/sounds/ambient.mp3');
     audio.loop = true;
-    audio.volume = 0.3; // Lower volume for background
+    audio.volume = 0.4;
 
-    const playAudio = () => {
-      audio.play().catch(e => console.log("Audio play blocked until interaction"));
-      // Remove listeners once playing starts
-      window.removeEventListener('click', playAudio);
-      window.removeEventListener('scroll', playAudio);
-    };
+    // Attempt to play immediately (Works if user has interacted with domain before)
+    const playPromise = audio.play();
 
-    // Browsers block autoplay, so we wait for the first user interaction
-    window.addEventListener('click', playAudio);
-    window.addEventListener('scroll', playAudio);
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // If blocked by browser, wait for first interaction
+        const enableAudio = () => {
+          audio.play();
+          // Remove listeners once active
+          window.removeEventListener('click', enableAudio);
+          window.removeEventListener('scroll', enableAudio);
+          window.removeEventListener('keydown', enableAudio);
+        };
+
+        window.addEventListener('click', enableAudio);
+        window.addEventListener('scroll', enableAudio);
+        window.addEventListener('keydown', enableAudio);
+      });
+    }
 
     return () => {
       audio.pause();
-      window.removeEventListener('click', playAudio);
-      window.removeEventListener('scroll', playAudio);
+      audio.currentTime = 0;
     };
   }, []);
   return null;
@@ -90,24 +97,24 @@ const AboutMeContent = () => {
       download={download}
       target={download ? "_self" : "_blank"}
       rel="noopener noreferrer"
-      className="group relative w-fit min-w-[160px] h-[50px] bg-zinc-900/80 -skew-x-12 border-l-4 border-white/20 flex items-center pr-8 pl-5 transition-all duration-300 hover:bg-zinc-800 hover:border-yellow-400 hover:skew-x-0 hover:translate-x-2"
+      className="group relative w-fit h-[50px] bg-zinc-900/80 -skew-x-12 border-l-4 border-white/20 flex items-center pr-6 pl-4 transition-all duration-300 hover:bg-zinc-800 hover:border-yellow-400 hover:skew-x-0 hover:translate-x-2"
     >
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${accentColor} transition-all duration-300 group-hover:w-2 group-hover:shadow-[0_0_15px_currentColor]`}></div>
-      <div className="flex items-center justify-between w-full gap-6"> 
-        <div className="flex items-center gap-4">
-          <div className="relative w-8 h-8 flex items-center justify-center bg-black/50 rounded p-1.5 border border-white/5">
+      <div className="flex items-center gap-6"> 
+        <div className="flex items-center gap-3">
+          <div className="relative w-7 h-7 flex items-center justify-center bg-black/50 rounded p-1 border border-white/5">
              <img src={logo} alt={label} className={`w-full h-full object-contain ${label === 'GITHUB' ? 'invert' : ''} opacity-70 group-hover:opacity-100 transition-opacity`} />
           </div>
           <div className="flex flex-col">
-            <span className={`text-sm font-bold font-['Orbitron'] tracking-widest ${color} group-hover:brightness-125 transition-all whitespace-nowrap`}>{label}</span>
-            <span className="text-[10px] font-mono text-gray-500 group-hover:text-green-400 transition-colors whitespace-nowrap">
+            <span className={`text-sm font-bold font-['Orbitron'] tracking-widest ${color} group-hover:brightness-125 transition-all`}>{label}</span>
+            <span className="text-[9px] font-mono text-gray-500 group-hover:text-green-400 transition-colors">
               <span className="group-hover:hidden">/// READY</span>
               <span className="hidden group-hover:inline animate-pulse">● CONNECTED</span>
             </span>
           </div>
         </div>
         <div className="hidden md:block text-right">
-          <span className="text-[2.5rem] leading-none font-bold font-['Rajdhani'] text-white/5 group-hover:text-white/10 transition-colors">0{index}</span>
+          <span className="text-[2rem] leading-none font-bold font-['Rajdhani'] text-white/5 group-hover:text-white/10 transition-colors">0{index}</span>
         </div>
       </div>
       <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/20"></div>
@@ -126,7 +133,7 @@ const AboutMeContent = () => {
         <p className="text-xl leading-relaxed text-gray-300 text-justify mb-8 font-['Rajdhani']" style={{ textAlign: 'justify' }}>
          Hi! I’m Frederick Ian Aranico, a Computer Science student and aspiring AI engineer with a strong focus on building practical, data-driven, and AI-powered applications. I enjoy working across the full stack—developing backend systems, crafting intuitive interfaces, and integrating machine learning models that solve real-world problems.
         </p>
-        <div className="flex flex-row flex-wrap gap-4">
+        <div className="flex flex-row flex-wrap gap-3">
           <ChipButton href="/resume.pdf" download={true} label="RESUME" color="text-yellow-400" accentColor="bg-yellow-400" logo="/assets/logos/resume.png" index={1} />
           <ChipButton href="https://github.com/Ennsss" label="GITHUB" color="text-gray-200" accentColor="bg-white" logo="/assets/logos/github.png" index={2} />
           <ChipButton href="https://www.linkedin.com/in/frederickaranico/" label="LINKEDIN" color="text-blue-400" accentColor="bg-blue-500" logo="/assets/logos/linkedin.jpg" index={3} />
@@ -210,12 +217,12 @@ const ScanningSatellite = ({ position, rotation, project, setFocusTarget }) => {
     setHover(true);
     const worldPos = new THREE.Vector3();
     e.object.getWorldPosition(worldPos);
-    if(setFocusTarget) setFocusTarget(worldPos);
+    setFocusTarget(worldPos);
   };
 
   const handlePointerOut = (e) => {
     setHover(false);
-    if(setFocusTarget) setFocusTarget(null);
+    setFocusTarget(null);
   };
 
   return (
@@ -247,14 +254,13 @@ const ScanningSatellite = ({ position, rotation, project, setFocusTarget }) => {
           <group position={[0, 0, bodyD/2 + 0.02]}>
             <mesh position={[bodyW/2 - 0.4, bodyH/2 - 0.3, 0]}><circleGeometry args={[0.08]} /><meshBasicMaterial color={hovered ? "#22c55e" : "#555"} /></mesh>
             <Text position={[bodyW/2 - 0.7, bodyH/2 - 0.3, 0]} fontSize={0.15} color="#22c55e" anchorX="right" anchorY="middle" font={fontBody}>LIVE</Text>
-            <Text position={[-bodyW/2 + 0.3, 0.8, 0]} fontSize={0.35} color="#38bdf8" anchorX="middle" anchorY="left" font={fontTitle}>{project.title.toUpperCase()}</Text>
-            <mesh position={[-bodyW/2 + 0.3, 0.5, 0]}><planeGeometry args={[0.05, 0.8]} /><meshBasicMaterial color="#334155" /></mesh>
-            <Text position={[-bodyW/2 + 0.5, 0.1, 0]} fontSize={0.2} color="#cbd5e1" anchorX="left" anchorY="middle" maxWidth={bodyW - 0.8} lineHeight={1.4} font={fontBody}>{project.desc}</Text>
+            <Text position={[-bodyW/2 + 0.2, 1, 0]} fontSize={0.32} color="#38bdf8" anchorX="middle" anchorY="left" font={fontTitle}>{project.title.toUpperCase()}</Text>
+            <Text position={[-bodyW/2 + 0.5, 0.25, 0]} fontSize={0.2} color="#cbd5e1" anchorX="left" anchorY="middle" maxWidth={bodyW - 0.8} lineHeight={1.4} font={fontBody}>{project.desc}</Text>
             {project.tech && project.tech.map((tech, i) => (
-              <group key={i} position={[-bodyW/2 + 0.8 + (i * 1.3), -0.6, 0]}>
-                 <mesh><planeGeometry args={[1.2, 0.35]} /><meshBasicMaterial color="#020617" transparent opacity={0.9} /></mesh>
+              <group key={i} position={[-bodyW/2 + 0.8 + (i * 1.3), -0.5, 0]}>
+                 <mesh><planeGeometry args={[2.5, 0.5]} /><meshBasicMaterial color="#020617" transparent opacity={0.9} /></mesh>
                  <lineSegments><edgesGeometry args={[new THREE.PlaneGeometry(1.2, 0.35)]} /><lineBasicMaterial color="#38bdf8" /></lineSegments>
-                 <Text position={[0,0,0.01]} fontSize={0.16} color="#ffffff" font={fontBody}>{tech}</Text>
+                 <Text position={[0,0,0.01]} fontSize={0.20} color="#23d400ff" font={fontBody}>{tech}</Text>
               </group>
             ))}
             <Text position={[-bodyW/2 + 0.3, -bodyH/2 + 0.3, 0]} fontSize={0.25} color="#facc15" anchorX="left" anchorY="bottom" font={fontTitle}>INITIALIZE →</Text>
@@ -297,11 +303,7 @@ const DataRing = () => {
         const z = Math.cos(angle) * radius;
         
         return (
-          <ScanningSatellite 
-            key={i} 
-            position={[x, 0, z]} 
-            project={proj}
-          />
+          <ScanningSatellite key={i} position={[x, 0, z]} project={proj} />
         );
       })}
     </group>
@@ -400,7 +402,9 @@ const HeroSolarSystem = () => {
       solarSystemRef.current.rotation.y += 0.001; 
       const scrollOffset = scroll.offset;
       const targetY = scrollOffset > 0.01 ? 50 : -2; 
-      solarSystemRef.current.position.y = THREE.MathUtils.lerp(solarSystemRef.current.position.y, targetY, 0.05);
+      solarSystemRef.current.position.y = THREE.MathUtils.lerp(
+        solarSystemRef.current.position.y, targetY, 0.05
+      );
     }
   });
   return (
@@ -422,7 +426,7 @@ const ContentPlanets = () => {
   const groupRef = useRef();
   const xOffset = viewport.width / 10; 
 
-  // --- AUDIO LOGIC FOR CLICKS ---
+  // --- CLICK SOUND LOGIC ---
   const clickSound = useMemo(() => new Audio('/assets/sounds/click.wav'), []);
   const playClick = () => {
     clickSound.currentTime = 0;
@@ -453,8 +457,7 @@ const ContentPlanets = () => {
             name={p.name} 
             scale={p.scale} 
             rotationSpeed={0.01} 
-            // Pass the audio handler to the Planet
-            onPlanetClick={playClick}
+            onPlanetClick={playClick} 
           />
           <pointLight distance={10} intensity={4} color="white" />
           {p.name === 'Earth' && <DataRing />}
@@ -467,7 +470,9 @@ const ContentPlanets = () => {
 function App() {
   return (
     <div className="fixed inset-0 bg-black">
+      {/* 1. ADDED SOUND MANAGER (AUTO PLAYS) */}
       <SoundManager />
+
       <Canvas shadows camera={{ position: [0, 20, 25], fov: 45 }}>
         <ambientLight intensity={0.5} />
         <pointLight position={[0, 0, 0]} intensity={2} color="white" />
@@ -483,14 +488,15 @@ function App() {
               <ContentPlanets />
             </Scroll>
 
-            {/* --- HTML OVERLAYS (FIXED POSITIONING) --- */}
+            {/* --- HTML LAYOUT (FIXED POSITIONING FOR 5 PAGES) --- */}
             <Scroll html>
+              
               {/* PAGE 1: HERO */}
               <div style={{ position: 'absolute', top: '0vh', width: '100vw' }}>
                 <HeroSection />
               </div>
 
-              {/* PAGE 2: ABOUT ME */}
+              {/* PAGE 2: ABOUT */}
               <div style={{ position: 'absolute', top: '100vh', width: '100vw' }}>
                 <AboutMeContent />
               </div>
@@ -500,15 +506,16 @@ function App() {
                 <SkillsContent />
               </div>
               
-              {/* PAGE 4: PROJECTS (EARTH) */}
+              {/* PAGE 4: PROJECTS */}
               <div style={{ position: 'absolute', top: '300vh', width: '100vw' }}>
                 <ProjectsOverlay />
               </div>
               
-              {/* PAGE 5: EXPERIENCE (MARS) */}
+              {/* PAGE 5: EXPERIENCE (MISSION LOG) - NOW FIXED */}
               <div style={{ position: 'absolute', top: '400vh', width: '100vw' }}>
                 <ExperienceContent />
               </div>
+
             </Scroll>
           </ScrollControls>
         </Suspense>
