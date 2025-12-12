@@ -1,10 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Optional: Set a default space font for everything */
 body {
-  margin: 0;
-  padding: 0;
-  background: #000; /* Fallback for 3D canvas */
-  overflow: hidden; /* Hide scrollbars */
-} 
+  font-family: 'Rajdhani', sans-serif;
+  background-color: black;
+}
+@layer utilities {
+  @keyframes scan {
+    0% { top: 0%; opacity: 0; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+  .animate-scan {
+    animation: scan 2s linear infinite;
+  }
+}

@@ -1,32 +1,47 @@
 import React, { useState, useEffect } from 'react';
 
-const Typewriter = ({ 
-  text, 
-  delay = 100, 
-  onComplete,
-  // Added className prop with default styles for the main title
-  className = "font-mono text-2xl sm:text-4xl md:text-6xl font-bold text-white tracking-tight"
-}) => {
+const Typewriter = ({ text, delay = 100, infinite = false, onComplete }) => {
   const [currentText, setCurrentText] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    if (currentIndex < text.length) {
-      const timeout = setTimeout(() => {
-        setCurrentText(prev => prev + text[currentIndex]);
-        setCurrentIndex(prev => prev + 1);
-      }, delay);
+    let timeout;
 
-      return () => clearTimeout(timeout);
-    } else if (onComplete) {
-      onComplete();
+    // Case 1: Typing
+    if (!isDeleting && currentText.length < text.length) {
+      timeout = setTimeout(() => {
+        setCurrentText(text.slice(0, currentText.length + 1));
+      }, delay);
+    } 
+    // Case 2: Finished Typing
+    else if (!isDeleting && currentText.length === text.length) {
+      if (onComplete) onComplete();
+      
+      if (infinite) {
+        // Wait 2 seconds before starting to delete
+        timeout = setTimeout(() => setIsDeleting(true), 2000);
+      }
+    } 
+    // Case 3: Deleting
+    else if (isDeleting && currentText.length > 0) {
+      timeout = setTimeout(() => {
+        setCurrentText(text.slice(0, currentText.length - 1));
+      }, 50); // Delete faster (50ms)
+    } 
+    // Case 4: Finished Deleting
+    else if (isDeleting && currentText.length === 0) {
+      setIsDeleting(false);
+      // Wait 0.5s before typing again
+      timeout = setTimeout(() => {}, 500); 
     }
-  }, [currentIndex, delay, text, onComplete]);
+
+    return () => clearTimeout(timeout);
+  }, [currentText, isDeleting, text, delay, infinite, onComplete]);
 
   return (
-    <span className={className}>
+    <span className="inline-block min-w-[1ch]">
       {currentText}
-      <span className="animate-pulse text-yellow-400">|</span>
+      <span className="animate-pulse">|</span>
     </span>
   );
 };

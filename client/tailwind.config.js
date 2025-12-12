@@ -7,18 +7,11 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        // Adds a nice tech-y font if available, or defaults to mono
-        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        // "Orbitron" for Headers (The Star Wars / Sci-Fi look)
+        space: ['"Orbitron"', 'sans-serif'],
+        // "Rajdhani" for Body text (Clean tech look)
+        tech: ['"Rajdhani"', 'sans-serif'],
       },
-      animation: {
-        'fade-in': 'fadeIn 1s ease-in forwards',
-      },
-      keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        }
-      }
     },
   },
   plugins: [],
