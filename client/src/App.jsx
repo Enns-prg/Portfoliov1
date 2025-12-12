@@ -420,18 +420,8 @@ const ProjectsOverlay = () => (
   </Section>
 );
 
-// --- GENERIC CONTENT ---
-const StandardContent = ({ title, subtitle, color, align }) => (
-  <Section align={align}>
-    <div className={`w-[40%] p-8 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl text-white ${align === 'right' ? 'text-right' : 'text-left'}`}>
-      <h2 className={`text-5xl font-bold mb-2 ${color} font-['Orbitron']`}>{title}</h2>
-      <h3 className="text-xl font-mono text-gray-400 mb-6 tracking-widest uppercase font-['Rajdhani']">{subtitle}</h3>
-      <p className="text-lg leading-relaxed text-gray-200 font-['Rajdhani']">
-        Context about {title} goes here.
-      </p>
-    </div>
-  </Section>
-);
+
+// --- EXPERIENCE SECTION (MISSION LOG) ---
 
 // --- 3D SCENE ---
 
@@ -473,8 +463,91 @@ const HeroSolarSystem = () => {
     </group>
   );
 };
+const ExperienceContent = () => {
+  const missions = [
+    {
+      id: "01",
+      role: "Software Developer Intern",
+      org: "LGU - Pasig City",
+      date: "Jan 2023 - April 2023",
+      desc: "Led a 4-member team to digitize incident reporting systems. Developed a normalized MySQL database and automated data migration using C#.",
+      stats: ["90% Faster Queries", "30% Faster Response"],
+      color: "text-blue-400",
+      border: "border-blue-500",
+      bg: "bg-blue-500/10"
+    },
+    {
+      id: "02",
+      role: "IT Specialist - Networking",
+      org: "Certiport Certification",
+      date: "May 2024",
+      desc: "Validated proficiency in network fundamentals, protocols, and infrastructure management. Demonstrated technical competency in modern IT systems.",
+      stats: ["Certified", "Networking"],
+      color: "text-yellow-400",
+      border: "border-yellow-500",
+      bg: "bg-yellow-500/10"
+    }
+  ];
 
-// REMOVED BlackHole3D component
+  return (
+    <Section align="right">
+      <div className="w-[100%] md:w-[55%] ml-auto z-10 flex flex-col gap-8 mr-10">
+        
+        {/* Header */}
+        <div className="text-right mb-4">
+          <h2 className="text-6xl font-black text-white mb-2 tracking-tighter font-['Orbitron']">MISSION LOG</h2>
+          <p className="text-red-400 font-mono text-sm tracking-[0.3em] uppercase font-['Rajdhani'] animate-pulse">
+            &lt; CAREER TRAJECTORY &gt;
+          </p>
+        </div>
+
+        {/* Experience Cards */}
+        <div className="flex flex-col gap-6">
+          {missions.map((mission) => (
+            <div 
+              key={mission.id}
+              className={`relative group p-6 bg-zinc-900/90 backdrop-blur-md border-r-4 ${mission.border} border-y border-l border-white/10 transition-all duration-300 hover:-translate-x-2 hover:shadow-[0_0_30px_rgba(0,0,0,0.5)]`}
+            >
+              {/* Header: Role & Date */}
+              <div className="flex justify-between items-start mb-4 border-b border-white/10 pb-4">
+                <div>
+                  <h3 className={`text-2xl font-bold font-['Orbitron'] ${mission.color} mb-1`}>{mission.role}</h3>
+                  <div className="flex items-center gap-2 text-white/60 font-mono text-sm">
+                    <span className="w-2 h-2 rounded-full bg-white/40"></span>
+                    {mission.org}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="block text-4xl font-bold font-['Rajdhani'] text-white/5 absolute top-4 right-4">{mission.id}</span>
+                  <span className="text-sm font-mono text-gray-400 bg-black/50 px-2 py-1 rounded">{mission.date}</span>
+                </div>
+              </div>
+
+              {/* Body: Description */}
+              <p className="text-gray-300 font-['Rajdhani'] text-lg leading-relaxed mb-6 text-justify">
+                {mission.desc}
+              </p>
+
+              {/* Footer: Stats/Tags */}
+              <div className="flex gap-3">
+                {mission.stats.map((stat, i) => (
+                  <span key={i} className={`px-3 py-1 text-xs font-bold font-['Orbitron'] rounded-sm ${mission.bg} ${mission.color} border border-white/5`}>
+                    {stat}
+                  </span>
+                ))}
+              </div>
+
+              {/* Corner Accents */}
+              <div className="absolute -left-[1px] -top-[1px] w-3 h-3 border-l border-t border-white/50"></div>
+              <div className="absolute -right-[1px] -bottom-[1px] w-3 h-3 border-r border-b border-white/50"></div>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </Section>
+  );
+};
 
 const ContentPlanets = () => {
   const { viewport } = useThree();
@@ -548,11 +621,10 @@ function App() {
               <HeroSection />
               <AboutMeContent />
               <SkillsContent />
-              
+             
               {/* USE THE ORBITAL OVERLAY */}
               <ProjectsOverlay />
-              
-              <StandardContent title="EXPERIENCE & CERTIFICATION" subtitle="My Journey" align="right" color="text-red-400" />
+               <ExperienceContent />
             </Scroll>
           </ScrollControls>
         </Suspense>
