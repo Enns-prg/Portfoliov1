@@ -1,46 +1,65 @@
 import React, { Suspense, useRef, useState, useMemo, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { ScrollControls, Scroll, useScroll, Html, Billboard, Text, RoundedBox } from '@react-three/drei';
+import { EffectComposer, Bloom } from '@react-three/postprocessing'; // IMPORT BLOOM
 import * as THREE from 'three';
 import Starfield from './components/Starfield';
 import Planet from './components/Planet';
 import Orbit from './components/Orbit';
 import Typewriter from './components/Typewriter';
 
-// --- 1. SOUND MANAGER (Refined for "Play Right Away") ---
-const SoundManager = () => {
+// --- 1. SOUND CONTROLLER (Button for Mute/Unmute/Start) ---
+const SoundController = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(null);
+
   useEffect(() => {
-    //
-    const audio = new Audio('/assets/sounds/ambient.mp3');
-    audio.loop = true;
-    audio.volume = 0.4;
-
-    // Attempt to play immediately (Works if user has interacted with domain before)
-    const playPromise = audio.play();
-
+    audioRef.current = new Audio('/assets/sounds/ambient.mp3');
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.4;
+    const playPromise = audioRef.current.play();
     if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        // If blocked by browser, wait for first interaction
-        const enableAudio = () => {
-          audio.play();
-          // Remove listeners once active
-          window.removeEventListener('click', enableAudio);
-          window.removeEventListener('scroll', enableAudio);
-          window.removeEventListener('keydown', enableAudio);
-        };
-
-        window.addEventListener('click', enableAudio);
-        window.addEventListener('scroll', enableAudio);
-        window.addEventListener('keydown', enableAudio);
-      });
+      playPromise
+        .then(() => setIsPlaying(true))
+        .catch(() => {
+          console.log("Autoplay blocked. User must interact to play.");
+          setIsPlaying(false);
+        });
     }
-
     return () => {
-      audio.pause();
-      audio.currentTime = 0;
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
     };
   }, []);
-  return null;
+
+  const toggleSound = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play().catch((e) => console.error("Playback failed:", e));
+      setIsPlaying(true);
+    }
+  };
+
+  return (
+    <div className="fixed top-6 left-6 z-50">
+      <button 
+        onClick={toggleSound}
+        className="p-3 bg-zinc-900/80 backdrop-blur-md border border-white/20 rounded-full hover:bg-zinc-800 hover:border-yellow-400 transition-all duration-300 group shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+        title={isPlaying ? "Mute Sound" : "Start Sound"}
+      >
+        {isPlaying ? (
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-green-400 group-hover:scale-110 transition-transform"><path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-red-400 group-hover:scale-110 transition-transform"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H6.31c-.95 0-1.838-.616-2.106-1.503a9.01 9.01 0 01-.194-2.117c.05-.72.23-1.408.528-2.036.319-.675 1.054-1.042 1.782-1.042h2.09z" /></svg>
+        )}
+      </button>
+    </div>
+  );
 };
 
 // --- HTML SECTIONS HELPER ---
@@ -61,7 +80,6 @@ const Section = ({ align = 'left', justify = 'center', children }) => (
 // --- HERO SECTION ---
 const HeroSection = () => {
   const [typingDone, setTypingDone] = useState(false);
-
   return (
     <Section align="left" justify="center">
       <div className="z-10 select-none mt-[-10vh]"> 
@@ -71,18 +89,11 @@ const HeroSection = () => {
         </div>
         <div className="mb-4 min-h-[3rem]">
            <div className="text-4xl md:text-6xl font-bold text-white mb-2 tracking-tighter font-['Orbitron']">
-             <Typewriter 
-               text="Frederick Ian Aranico" 
-               delay={100} 
-               infinite={true} 
-               onComplete={() => setTypingDone(true)} 
-             />
+             <Typewriter text="Frederick Ian Aranico" delay={100} infinite={true} onComplete={() => setTypingDone(true)} />
            </div>
         </div>
         <div className={`transition-opacity duration-1000 ${typingDone ? 'opacity-100' : 'opacity-0'}`}>
-          <p className="text-gray-300 font-light tracking-widest uppercase text-lg border-l-2 border-yellow-400 pl-4 font-['Rajdhani']">
-            Full Stack Developer 
-          </p>
+          <p className="text-gray-300 font-light tracking-widest uppercase text-lg border-l-2 border-yellow-400 pl-4 font-['Rajdhani']">Full Stack Developer</p>
         </div>
       </div>
     </Section>
@@ -92,13 +103,7 @@ const HeroSection = () => {
 // --- ABOUT ME SECTION ---
 const AboutMeContent = () => {
   const ChipButton = ({ href, download, color, label, logo, index, accentColor }) => (
-    <a 
-      href={href} 
-      download={download}
-      target={download ? "_self" : "_blank"}
-      rel="noopener noreferrer"
-      className="group relative w-fit h-[50px] bg-zinc-900/80 -skew-x-12 border-l-4 border-white/20 flex items-center pr-6 pl-4 transition-all duration-300 hover:bg-zinc-800 hover:border-yellow-400 hover:skew-x-0 hover:translate-x-2"
-    >
+    <a href={href} download={download} target={download ? "_self" : "_blank"} rel="noopener noreferrer" className="group relative w-fit h-[50px] bg-zinc-900/80 -skew-x-12 border-l-4 border-white/20 flex items-center pr-6 pl-4 transition-all duration-300 hover:bg-zinc-800 hover:border-yellow-400 hover:skew-x-0 hover:translate-x-2">
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${accentColor} transition-all duration-300 group-hover:w-2 group-hover:shadow-[0_0_15px_currentColor]`}></div>
       <div className="flex items-center gap-6"> 
         <div className="flex items-center gap-3">
@@ -187,7 +192,7 @@ const SkillsContent = () => {
   );
 };
 
-// --- SCANNING SATELLITE (BALANCED LAYOUT) ---
+// --- SCANNING SATELLITE ---
 const ScanningSatellite = ({ position, rotation, project, setFocusTarget }) => {
   const [hovered, setHover] = useState(false);
   const scanBarRef = useRef();
@@ -208,7 +213,6 @@ const ScanningSatellite = ({ position, rotation, project, setFocusTarget }) => {
   const bodyW = 5;
   const bodyH = 3.5;
   const bodyD = 0.2;
-
   const fontTitle = "/fonts/Orbitron-Bold.ttf";
   const fontBody = "/fonts/Rajdhani-Medium.ttf";
 
@@ -219,8 +223,7 @@ const ScanningSatellite = ({ position, rotation, project, setFocusTarget }) => {
     e.object.getWorldPosition(worldPos);
     setFocusTarget(worldPos);
   };
-
-  const handlePointerOut = (e) => {
+  const handlePointerOut = () => {
     setHover(false);
     setFocusTarget(null);
   };
@@ -228,23 +231,9 @@ const ScanningSatellite = ({ position, rotation, project, setFocusTarget }) => {
   return (
     <group position={position} rotation={rotation}>
       <Billboard follow={true} lockX={false} lockY={false} lockZ={false}>
-        <group 
-          onPointerOver={handlePointerOver} 
-          onPointerOut={handlePointerOut}
-          onClick={() => window.open(project.link, '_blank')}
-          scale={hovered ? 1.05 : 1}
-        >
-          {/* Chassis */}
+        <group onPointerOver={handlePointerOver} onPointerOut={handlePointerOut} onClick={() => window.open(project.link, '_blank')} scale={hovered ? 1.05 : 1}>
           <RoundedBox args={[bodyW, bodyH, bodyD]} radius={0.1} smoothness={4}>
-            <meshPhysicalMaterial 
-              color={hovered ? "#0f172a" : "#000000"} 
-              roughness={0.2} 
-              metalness={0.8}
-              transmission={0.5} 
-              transparent={true}
-              opacity={0.8} 
-              thickness={0.5} 
-            />
+            <meshPhysicalMaterial color={hovered ? "#0f172a" : "#000000"} roughness={0.2} metalness={0.8} transmission={0.5} transparent={true} opacity={0.8} thickness={0.5} />
           </RoundedBox>
           <mesh ref={scanBarRef} position={[0, 0, bodyD/2 + 0.05]} visible={false}>
              <boxGeometry args={[bodyW + 0.2, 0.05, 0.05]} />
@@ -274,7 +263,6 @@ const ScanningSatellite = ({ position, rotation, project, setFocusTarget }) => {
 
 const DataRing = () => {
   const groupRef = useRef();
-  
   const projects = [
     { title: "Vigilens", desc: "Full-stack AI surveillance automating anomaly detection with multi-camera analysis.", tech: ["PYTHON", "YOLOv11", "REACT"], link: "https://github.com/Ennsss" },
     { title: "Solaris Web", desc: "Immersive 3D portfolio featuring reactive physics, orbital navigation, and 'scrollytelling'.", tech: ["REACT", "THREE.JS", "R3F"], link: "https://github.com/Ennsss" },
@@ -282,29 +270,24 @@ const DataRing = () => {
     { title: "Sentiment Analysis", desc: "Recommendation engine optimizing complaint resolution using NLP and secure user profiling.", tech: ["PYTHON", "TENSORFLOW", "MYSQL"], link: "https://github.com/Ennsss" },
   ];
 
-  useFrame((state) => {
+  useFrame(() => {
     if (groupRef.current) {
       groupRef.current.rotation.y += 0.002;
     }
   });
-
   const radius = 8; 
 
   return (
-    <group ref={groupRef} rotation={[0, 20, 0]}> 
+    <group ref={groupRef} rotation={[-0, 20, -10]}> 
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[radius - 0.05, radius + 0.05, 128]} />
         <meshBasicMaterial color="#38bdf8" side={THREE.DoubleSide} transparent opacity={0.15} />
       </mesh>
-
       {projects.map((proj, i) => {
         const angle = (i / projects.length) * Math.PI * 2;
         const x = Math.sin(angle) * radius;
         const z = Math.cos(angle) * radius;
-        
-        return (
-          <ScanningSatellite key={i} position={[x, 0, z]} project={proj} />
-        );
+        return <ScanningSatellite key={i} position={[x, 0, z]} project={proj} />;
       })}
     </group>
   );
@@ -319,7 +302,7 @@ const ProjectsOverlay = () => (
   </Section>
 );
 
-// --- EXPERIENCE SECTION (MISSION LOG) ---
+// --- EXPERIENCE SECTION ---
 const ExperienceContent = () => {
   const missions = [
     {
@@ -329,9 +312,7 @@ const ExperienceContent = () => {
       date: "Jan 2023 - April 2023",
       desc: "Led a 4-member team to digitize incident reporting systems. Developed a normalized MySQL database and automated data migration using C#.",
       stats: ["90% Faster Queries", "30% Faster Response"],
-      color: "text-blue-400",
-      border: "border-blue-500",
-      bg: "bg-blue-500/10"
+      color: "text-blue-400", border: "border-blue-500", bg: "bg-blue-500/10"
     },
     {
       id: "02",
@@ -340,9 +321,7 @@ const ExperienceContent = () => {
       date: "May 2024",
       desc: "Validated proficiency in network fundamentals, protocols, and infrastructure management. Demonstrated technical competency in modern IT systems.",
       stats: ["Certified", "Networking"],
-      color: "text-yellow-400",
-      border: "border-yellow-500",
-      bg: "bg-yellow-500/10"
+      color: "text-yellow-400", border: "border-yellow-500", bg: "bg-yellow-500/10"
     }
   ];
 
@@ -394,6 +373,7 @@ const CameraRig = () => {
   return null;
 }
 
+// --- HERO SOLAR SYSTEM (TARGET FOR BLOOM) ---
 const HeroSolarSystem = () => {
   const scroll = useScroll();
   const solarSystemRef = useRef();
@@ -409,12 +389,13 @@ const HeroSolarSystem = () => {
   });
   return (
     <group ref={solarSystemRef} position={[5, -2, 0]}>
-      <Planet name="Sun" scale={3} rotationSpeed={0.002} />
+      {/* GLOWING ENABLED FOR THESE PLANETS */}
+      <Planet name="Sun" scale={3} rotationSpeed={0.002} glowing={true} />
       <group>
-        <Orbit radius={5} />   <Planet name="Mercury" scale={6} orbitRadius={5} orbitSpeed={1} />
-        <Orbit radius={7} />   <Planet name="Venus" scale={9} orbitRadius={7} orbitSpeed={0.6} />
-        <Orbit radius={10} />  <Planet name="Earth" scale={0.15} orbitRadius={10} orbitSpeed={0.4} />
-        <Orbit radius={12.5} /> <Planet name="Mars" scale={6} orbitRadius={12.5} orbitSpeed={0.3} />
+        <Orbit radius={5} />   <Planet name="Mercury" scale={6} orbitRadius={5} orbitSpeed={1} glowing={true} />
+        <Orbit radius={7} />   <Planet name="Venus" scale={9} orbitRadius={7} orbitSpeed={0.6} glowing={true} />
+        <Orbit radius={10} />  <Planet name="Earth" scale={0.15} orbitRadius={10} orbitSpeed={0.4} glowing={true} />
+        <Orbit radius={12.5} /> <Planet name="Mars" scale={6} orbitRadius={12.5} orbitSpeed={0.3} glowing={true} />
       </group>
     </group>
   );
@@ -425,8 +406,6 @@ const ContentPlanets = () => {
   const scroll = useScroll(); 
   const groupRef = useRef();
   const xOffset = viewport.width / 10; 
-
-  // --- CLICK SOUND LOGIC ---
   const clickSound = useMemo(() => new Audio('/assets/sounds/click.wav'), []);
   const playClick = () => {
     clickSound.currentTime = 0;
@@ -458,6 +437,7 @@ const ContentPlanets = () => {
             scale={p.scale} 
             rotationSpeed={0.01} 
             onPlanetClick={playClick} 
+            // glowing={false} by default, so these WON'T bloom
           />
           <pointLight distance={10} intensity={4} color="white" />
           {p.name === 'Earth' && <DataRing />}
@@ -470,8 +450,7 @@ const ContentPlanets = () => {
 function App() {
   return (
     <div className="fixed inset-0 bg-black">
-      {/* 1. ADDED SOUND MANAGER (AUTO PLAYS) */}
-      <SoundManager />
+      <SoundController />
 
       <Canvas shadows camera={{ position: [0, 20, 25], fov: 45 }}>
         <ambientLight intensity={0.5} />
@@ -482,42 +461,28 @@ function App() {
           
           <ScrollControls pages={5} damping={0.3}>
             <CameraRig />
+            
+            {/* THIS COMPONENT HAS THE GLOWING PLANETS */}
             <HeroSolarSystem />
             
             <Scroll>
               <ContentPlanets />
             </Scroll>
 
-            {/* --- HTML LAYOUT (FIXED POSITIONING FOR 5 PAGES) --- */}
             <Scroll html>
-              
-              {/* PAGE 1: HERO */}
-              <div style={{ position: 'absolute', top: '0vh', width: '100vw' }}>
-                <HeroSection />
-              </div>
-
-              {/* PAGE 2: ABOUT */}
-              <div style={{ position: 'absolute', top: '100vh', width: '100vw' }}>
-                <AboutMeContent />
-              </div>
-
-              {/* PAGE 3: SKILLS */}
-              <div style={{ position: 'absolute', top: '200vh', width: '100vw' }}>
-                <SkillsContent />
-              </div>
-              
-              {/* PAGE 4: PROJECTS */}
-              <div style={{ position: 'absolute', top: '300vh', width: '100vw' }}>
-                <ProjectsOverlay />
-              </div>
-              
-              {/* PAGE 5: EXPERIENCE (MISSION LOG) - NOW FIXED */}
-              <div style={{ position: 'absolute', top: '400vh', width: '100vw' }}>
-                <ExperienceContent />
-              </div>
-
+              <div style={{ position: 'absolute', top: '0vh', width: '100vw' }}> <HeroSection /> </div>
+              <div style={{ position: 'absolute', top: '100vh', width: '100vw' }}> <AboutMeContent /> </div>
+              <div style={{ position: 'absolute', top: '200vh', width: '100vw' }}> <SkillsContent /> </div>
+              <div style={{ position: 'absolute', top: '300vh', width: '100vw' }}> <ProjectsOverlay /> </div>
+              <div style={{ position: 'absolute', top: '400vh', width: '100vw' }}> <ExperienceContent /> </div>
             </Scroll>
           </ScrollControls>
+          
+          {/* POST PROCESSING: High threshold ensures only glowing=true planets bloom */}
+          <EffectComposer disableNormalPass>
+            <Bloom luminanceThreshold={1} mipmapBlur intensity={1.5} />
+          </EffectComposer>
+
         </Suspense>
       </Canvas>
     </div>

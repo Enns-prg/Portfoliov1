@@ -14,7 +14,8 @@ const Planet = ({
   initialPosition = [0, 0, 0],
   yOffset = 0,
   onPlanetClick,
-  blackHolePosRef = null // NEW: Receive the Black Hole's position
+  blackHolePosRef = null,
+  glowing = false // NEW: Prop to enable bloom
 }) => {
   const { scene } = useGLTF(`/assets/models/${name}.glb`);
   const planetRef = useRef();
@@ -24,46 +25,54 @@ const Planet = ({
   const [isSpinning, setIsSpinning] = useState(false);
   const spinSpeed = useRef(rotationSpeed);
   
-  // Reuse vector to prevent memory leaks during frame loop
   const myWorldPos = useMemo(() => new THREE.Vector3(), []);
 
   useEffect(() => {
     sceneClone.traverse((child) => {
       if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
+        child.castShadow = true;
+        child.receiveShadow = true;
+
+        // --- BLOOM LOGIC ---
+        if (glowing) {
+          // 1. Assign the object's texture/color to its emissive channel
+          child.material.emissive = child.material.color;
+          child.material.emissiveMap = child.material.map;
+
+          // 2. Set intensity based on object type
+          // Sun gets super bright (2.0), others get subtle glow (0.5)
+          const glowIntensity = name === 'Sun' ? 2.0 : 0.5;
+          child.material.emissiveIntensity = glowIntensity;
+
+          // 3. Disable tone mapping so colors can exceed 1.0 (required for Bloom)
+          child.material.toneMapped = false;
+        } else {
+          // Reset defaults if not glowing
+          child.material.emissiveIntensity = 0;
+          child.material.toneMapped = true;
+        }
       }
     });
-  }, [sceneClone, name]);
+  }, [sceneClone, name, glowing]);
 
   useFrame(({ clock }) => {
     if (planetRef.current) {
-      // --- 1. PROXIMITY CHECK (Make planet spin if Black Hole is close) ---
+      // --- PROXIMITY CHECK ---
       let proximityBoost = 0;
-      
       if (blackHolePosRef && blackHolePosRef.current) {
-        // Get this planet's true position in the world (accounting for Scroll)
         planetRef.current.getWorldPosition(myWorldPos);
-        
-        // Calculate distance to Black Hole
         const distance = myWorldPos.distanceTo(blackHolePosRef.current);
-        
-        // If closer than 5 units, spin crazy fast!
         if (distance < 10) {
-          // The closer it is, the faster it spins (max +0.2 speed)
           proximityBoost = THREE.MathUtils.lerp(0.2, 0, distance / 5); 
         }
       }
 
-      // --- 2. ROTATION LOGIC ---
-      // Base Speed + Click Boost + Proximity Boost
+      // --- ROTATION ---
       const targetSpeed = (isSpinning ? 0.2 : rotationSpeed) + proximityBoost;
-      
-      // Smoothly accelerate/decelerate
       spinSpeed.current = THREE.MathUtils.lerp(spinSpeed.current, targetSpeed, 0.1);
       planetRef.current.rotation.y += spinSpeed.current;
 
-      // --- 3. ORBIT LOGIC ---
+      // --- ORBIT ---
       if (orbitRadius > 0) {
         const t = clock.getElapsedTime() * orbitSpeed + offset.current;
         const x = Math.cos(t) * orbitRadius;
