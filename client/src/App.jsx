@@ -22,6 +22,7 @@ const Section = ({ align = 'left', justify = 'center', children }) => (
   </div>
 );
 
+
 // --- HERO SECTION ---
 const HeroSection = () => {
   const [typingDone, setTypingDone] = useState(false);
@@ -53,47 +54,125 @@ const HeroSection = () => {
   );
 };
 
-// --- ABOUT ME SECTION ---
-const AboutMeContent = () => (
-  <Section align="left">
-    <div className="w-[45%] text-white mt-[-5rem] z-10">
-      <div className="relative mb-8 group">
-        <div className="absolute -inset-1 bg-gradient-to-br from-yellow-400 via-transparent to-red-400 rounded-full opacity-50 blur-sm animate-spin [animation-duration:3s] group-hover:opacity-80 transition duration-500"></div>
-        <img 
-          src="/assets/images/me.jpg" 
-          alt="Frederick Ian Aranico" 
-          className="relative w-48 h-48 rounded-full border-2 border-yellow-100/50 object-cover shadow-2xl"
-        />
-      </div>
-      <h3 className="text-4xl font-bold mb-6 font-['Orbitron'] tracking-wide">ABOUT ME</h3>
-      <p className="text-xl leading-relaxed text-gray-300 text-justify mb-8 font-['Rajdhani']" style={{ textAlign: 'justify' }}>
-       Hi! I’m Frederick Ian Aranico, a Computer Science student and aspiring AI engineer with a strong focus on building practical, data-driven, and AI-powered applications. I enjoy working across the full stack—developing backend systems, crafting intuitive interfaces, and integrating machine learning models that solve real-world problems.
-      </p>
-      {/* Social Buttons */}
-      <div className="flex flex-wrap gap-8">
-        <a href="/resume.pdf" download="Frederick_Aranico_Resume.pdf" className="group relative flex items-center justify-center px-8 py-3 overflow-hidden rounded-full bg-black/50 border border-yellow-500/30 transition-all duration-300 hover:border-transparent hover:shadow-[0_0_20px_rgba(250,204,21,0.6)] active:scale-95">
-          <div className="absolute inset-0 bg-yellow-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out"></div>
-          <span className="relative z-10 font-bold tracking-widest text-sm text-yellow-100 transition-all duration-300 group-hover:text-black group-hover:tracking-[0.25em] font-['Orbitron']">RESUME</span>
-        </a>
-        <a href="https://github.com/Ennsss" target="_blank" rel="noopener noreferrer" className="group relative flex items-center justify-center px-8 py-3 overflow-hidden rounded-full bg-black/50 border border-white/30 transition-all duration-300 hover:border-transparent hover:shadow-[0_0_20px_rgba(255,255,255,0.6)] active:scale-95">
-          <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out"></div>
-          <span className="relative z-10 font-bold tracking-widest text-sm text-gray-200 transition-all duration-300 group-hover:text-black group-hover:tracking-[0.25em] font-['Orbitron']">GITHUB</span>
-        </a>
-        <a href="https://www.linkedin.com/in/frederickaranico/" target="_blank" rel="noopener noreferrer" className="group relative flex items-center justify-center px-8 py-3 overflow-hidden rounded-full bg-black/50 border border-blue-400/50 transition-all duration-300 hover:border-transparent hover:shadow-[0_0_20px_rgba(96,165,250,0.6)] active:scale-95">
-          <div className="absolute inset-0 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out"></div>
-          <span className="relative z-10 font-bold tracking-widest text-sm text-cyan-100 transition-all duration-300 group-hover:text-white group-hover:tracking-[0.25em] font-['Orbitron']">LINKEDIN</span>
-        </a>
-      </div>
-    </div>
-  </Section>
-);
+// --- ABOUT ME SECTION (COMPACT CYBER-DECK CHIPS) ---
+const AboutMeContent = () => {
+  // Helper to render a "Tech Chip" button
+  const ChipButton = ({ href, download, color, label, logo, index, accentColor }) => (
+    <a 
+      href={href} 
+      download={download}
+      target={download ? "_self" : "_blank"}
+      rel="noopener noreferrer"
+      // CHANGED: 
+      // 1. w-full md:w-auto -> w-fit (Shrinks to content size)
+      // 2. Reduced padding (pr-6 pl-4) to tighten it further
+      className="group relative w-fit h-[50px] bg-zinc-900/80 -skew-x-12 border-l-4 border-white/20 flex items-center pr-6 pl-4 transition-all duration-300 hover:bg-zinc-800 hover:border-yellow-400 hover:skew-x-0 hover:translate-x-2"
+    >
+      {/* Color Accent Bar (Left Side) */}
+      <div className={`absolute left-0 top-0 bottom-0 w-1 ${accentColor} transition-all duration-300 group-hover:w-2 group-hover:shadow-[0_0_15px_currentColor]`}></div>
 
+      {/* Content Container */}
+      <div className="flex items-center gap-6"> 
+        
+        {/* Left: Logo & Label */}
+        <div className="flex items-center gap-3">
+          {/* Smaller Logo Container */}
+          <div className="relative w-7 h-7 flex items-center justify-center bg-black/50 rounded p-1 border border-white/5">
+             <img 
+               src={logo} 
+               alt={label} 
+               className={`w-full h-full object-contain ${label === 'GITHUB' ? 'invert' : ''} opacity-70 group-hover:opacity-100 transition-opacity`} 
+             />
+          </div>
+          <div className="flex flex-col">
+            <span className={`text-sm font-bold font-['Orbitron'] tracking-widest ${color} group-hover:brightness-125 transition-all`}>
+              {label}
+            </span>
+            {/* Tiny Tech Status Text */}
+            <span className="text-[9px] font-mono text-gray-500 group-hover:text-green-400 transition-colors">
+              <span className="group-hover:hidden">/// READY</span>
+              <span className="hidden group-hover:inline animate-pulse">● CONNECTED</span>
+            </span>
+          </div>
+        </div>
+
+        {/* Right: Serial Number (Decorative) */}
+        {/* Kept visible but closer to text due to w-fit */}
+        <div className="hidden md:block text-right">
+          <span className="text-[2rem] leading-none font-bold font-['Rajdhani'] text-white/5 group-hover:text-white/10 transition-colors">
+            0{index}
+          </span>
+        </div>
+
+      </div>
+
+      {/* Corner Tech Detail */}
+      <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/20"></div>
+      <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20"></div>
+    </a>
+  );
+
+  return (
+    <Section align="left">
+      <div className="w-[45%] text-white mt-[-5rem] z-10">
+        
+        {/* Profile Image (unchanged) */}
+        <div className="relative mb-8 group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-full opacity-30 blur-md group-hover:opacity-70 transition duration-500"></div>     
+               <img 
+            src="/assets/images/me.jpg" 
+            alt="Frederick Ian Aranico" 
+            className="relative w-48 h-48 rounded-full border-2 border-yellow-100/50 object-cover shadow-2xl"
+          />
+        </div>
+
+        <h3 className="text-4xl font-bold mb-6 font-['Orbitron'] tracking-wide">ABOUT ME</h3>
+        <p className="text-xl leading-relaxed text-gray-300 text-justify mb-8 font-['Rajdhani']" style={{ textAlign: 'justify' }}>
+         Hi! I’m Frederick Ian Aranico, a Computer Science student and aspiring AI engineer with a strong focus on building practical, data-driven, and AI-powered applications. I enjoy working across the full stack—developing backend systems, crafting intuitive interfaces, and integrating machine learning models that solve real-world problems.
+        </p>
+        
+        {/* Data Chips Container */}
+        <div className="flex flex-row flex-wrap gap-3">
+          
+          <ChipButton 
+            href="/resume.pdf" 
+            download={true}
+            label="RESUME" 
+            color="text-yellow-400" 
+            accentColor="bg-yellow-400"
+            logo="/assets/logos/resume.png"
+            index={1}
+          />
+
+          <ChipButton 
+            href="https://github.com/Ennsss" 
+            label="GITHUB" 
+            color="text-gray-200" 
+            accentColor="bg-white"
+            logo="/assets/logos/github.png"
+            index={2}
+          />
+
+          <ChipButton 
+            href="https://www.linkedin.com/in/frederickaranico/" 
+            label="LINKEDIN" 
+            color="text-blue-400" 
+            accentColor="bg-blue-500"
+            logo="/assets/logos/linkedin.jpg"
+            index={3}
+          />
+
+        </div>
+      </div>
+    </Section>
+  );
+};
 // --- SKILLS SECTION ---
 const SkillsContent = () => {
   const skillGroups = [
     { category: "LANGUAGES", color: "text-yellow-400", accent: "border-yellow-400", bgHover: "hover:bg-yellow-400/10", skills: ["Python", "JavaScript", "C#", "C++", "Java", "HTML/CSS"] },
     { category: "AI & DATA", color: "text-red-400", accent: "border-red-400", bgHover: "hover:bg-red-400/10", skills: ["TensorFlow", "YOLOv11", "Gemini API", "Pandas", "OpenCV"] },
-    { category: "FRAMEWORKS", color: "text-blue-400", accent: "border-blue-400", bgHover: "hover:bg-blue-400/10", skills: ["React", "Node.js", "Flask", "Django", "ASP.NET"] },
+    { category: "FRAMEWORKS ", color: "text-blue-400", accent: "border-blue-400", bgHover: "hover:bg-blue-400/10", skills: ["React", "Node.js", "Flask", "Django", "ASP.NET", "Three.js"] },
     { category: "TOOLS & DB", color: "text-green-400", accent: "border-green-400", bgHover: "hover:bg-green-400/10", skills: ["MySQL", "MongoDB", "AWS", "Git", "Postman"] }
   ];
 
@@ -101,7 +180,7 @@ const SkillsContent = () => {
     <Section align="right">
       <div className="w-[100%] ml-auto flex flex-col items-start z-10 pointer-events-none pl-10">
         <div className="mb-10 pl-4 border-l-2 border-white/20">
-          <h2 className="text-6xl font-black text-white mb-2 tracking-tighter font-['Orbitron']">ARSENAL</h2>
+          <h2 className="text-6xl font-black text-white mb-1 tracking-tighter font-['Orbitron']"> SKILLS</h2>
           <div className="flex items-center gap-3 text-gray-400 font-mono text-sm tracking-[0.3em] uppercase font-tech">
              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
              System Status: Online
@@ -161,7 +240,7 @@ const ScanningSatellite = ({ position, rotation, project }) => {
 
   return (
     <group position={position} rotation={rotation}>
-      <Billboard follow={true} lockX={false} lockY={false} lockZ={false}>
+      <Billboard follow={true} lockX={false} lockY={false} lockZ={false}>``
         <group 
           onPointerOver={() => setHover(true)} 
           onPointerOut={() => setHover(false)}
@@ -295,10 +374,12 @@ const DataRing = () => {
     }
   });
 
-  const radius = 6; 
+  const radius = 8; 
 
   return (
-    <group ref={groupRef} rotation={[0.5, 0, 0]}> {/* Tilted Ring to match screenshot */}
+    // CHANGED: rotation X from 0.5 to 1.3
+    // This tilts the ring up so it faces the camera directly
+    <group ref={groupRef} rotation={[0, 20, 0]}> 
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[radius - 0.05, radius + 0.05, 128]} />
         <meshBasicMaterial color="#38bdf8" side={THREE.DoubleSide} transparent opacity={0.15} />
@@ -313,7 +394,7 @@ const DataRing = () => {
           <ScanningSatellite 
             key={i} 
             position={[x, 0, z]} 
-            project={proj}
+            project={proj}a   
           />
         );
       })}
@@ -326,7 +407,7 @@ const ProjectsOverlay = () => (
   <Section align="center" justify="start">
     <div className="mt-10 text-center pointer-events-none z-10">
       <h2 className="text-6xl font-black text-cyan-400 mb-2 tracking-tighter font-['Orbitron'] drop-shadow-lg">
-        ORBITAL NETWORK
+        PROJECTS
       </h2>
       <p className="text-white font-mono text-sm tracking-[0.3em] uppercase font-['Rajdhani'] animate-pulse">
         &lt; GLOBAL DATA RING DETECTED /&gt;
@@ -348,7 +429,7 @@ const StandardContent = ({ title, subtitle, color, align }) => (
   </Section>
 );
 
-// --- 3D SCENE & BLACK HOLE ---
+// --- 3D SCENE ---
 
 const CameraRig = () => {
   const scroll = useScroll();
@@ -356,7 +437,7 @@ const CameraRig = () => {
     const scrollOffset = scroll.offset; 
     const transitionPhase = THREE.MathUtils.clamp(scrollOffset * 3, 0, 1);
     const startPos = new THREE.Vector3(0, 20, 25);
-    const endPos = new THREE.Vector3(0, 6, 20); 
+    const endPos = new THREE.Vector3(0, 13, 20); 
     state.camera.position.lerpVectors(startPos, endPos, transitionPhase);
     state.camera.lookAt(0, 0, 0);
   });
@@ -389,77 +470,9 @@ const HeroSolarSystem = () => {
   );
 };
 
-const BlackHole3D = ({ sharedPosRef }) => {
-  const scroll = useScroll();
-  const bhRef = useRef();
-  const [hovered, setHover] = useState(false);
-  const [active, setActive] = useState(false);
-  const clickSound = useMemo(() => new Audio('/assets/sounds/click.wav'), []);
+// REMOVED BlackHole3D component
 
-  useEffect(() => {
-    if (sharedPosRef && bhRef.current) {
-      sharedPosRef.current.set(3, 0, 0);
-    }
-  }, [sharedPosRef]);
-
-  useFrame(() => {
-    if (bhRef.current) {
-      const targetSpeed = active ? 0.2 : (hovered ? 0.05 : 0.005);
-      bhRef.current.rotation.y += targetSpeed;
-      
-      const start = 0.3; 
-      const end = 0.64; 
-      const offset = scroll.offset;
-      const isVisibleSection = offset > start && offset < end;
-      
-      let targetScale = 0;
-      if (active) {
-        targetScale = 50; 
-      } else if (isVisibleSection) {
-        targetScale = hovered ? 0.2 : 0.15;
-      }
-      
-      const currentScale = bhRef.current.scale.x;
-      const newScale = THREE.MathUtils.lerp(currentScale, targetScale, 0.1);
-      bhRef.current.scale.set(newScale, newScale, newScale);
-
-      if (sharedPosRef) {
-        if (isVisibleSection) {
-            sharedPosRef.current.set(3, 0, 0); 
-        } else {
-            sharedPosRef.current.set(1000, 1000, 1000); 
-        }
-      }
-    }
-  });
-
-  const handleInteract = () => {
-    if (!active) {
-      clickSound.volume = 0.5;
-      clickSound.currentTime = 0;
-      clickSound.play();
-      setActive(true);
-      setTimeout(() => setActive(false), 2000);
-    }
-  };
-
-  return (
-    <group 
-      ref={bhRef} 
-      position={[3, 0, 0]}
-      scale={[0,0,0]}
-      onClick={handleInteract}
-      onPointerOver={() => { setHover(true); document.body.style.cursor = 'pointer'; }}
-      onPointerOut={() => { setHover(false); document.body.style.cursor = 'auto'; }}
-    >
-      <Planet name="BlackHole" scale={1} /> 
-      <pointLight color="#a855f7" distance={20} intensity={5} />
-      <pointLight color="#ffffff" distance={10} intensity={hovered ? 3 : 0} transition="intensity 0.5s"/>
-    </group>
-  );
-};
-
-const ContentPlanets = ({ blackHolePosRef }) => {
+const ContentPlanets = () => {
   const { viewport } = useThree();
   const scroll = useScroll(); 
   const groupRef = useRef();
@@ -470,7 +483,7 @@ const ContentPlanets = ({ blackHolePosRef }) => {
     { name: "Mercury", scale: 54, position: [xOffset, -viewport.height * 1, 0] },
     { name: "Venus",   scale: 35, position: [-xOffset, -viewport.height * 2, 0] },
     // EARTH PROPORTIONS FIXED: 1.5 Scale (Big), Centered X, Lowered Y
-    { name: "Earth",   scale: 0.35, position: [0, -viewport.height * 3, 0] }, 
+    { name: "Earth",   scale: 0.45, position: [0, -viewport.height * 3, 0] }, 
     { name: "Mars",    scale: 34, position: [-xOffset, -viewport.height * 4, 0] },
   ], [viewport, xOffset]);
 
@@ -492,7 +505,7 @@ const ContentPlanets = ({ blackHolePosRef }) => {
             name={p.name} 
             scale={p.scale} 
             rotationSpeed={0.01} 
-            blackHolePosRef={blackHolePosRef} 
+            // Removed blackHolePosRef prop
           />
           <pointLight distance={10} intensity={4} color="white" />
 
@@ -507,7 +520,7 @@ const ContentPlanets = ({ blackHolePosRef }) => {
 };
 
 function App() {
-  const blackHolePosRef = useRef(new THREE.Vector3(1000, 1000, 1000));
+  // Removed blackHolePosRef
 
   return (
     <div className="fixed inset-0 bg-black">
@@ -521,16 +534,16 @@ function App() {
           <ScrollControls pages={5} damping={0.3}>
             <CameraRig />
             <HeroSolarSystem />
-            <BlackHole3D sharedPosRef={blackHolePosRef} />
+            {/* Removed BlackHole3D */}
             
             <Scroll>
-              <ContentPlanets blackHolePosRef={blackHolePosRef} />
+              <ContentPlanets />
             </Scroll>
 
             <Scroll html>
               <HeroSection />
               <AboutMeContent />
-      
+              <SkillsContent />
               
               {/* USE THE ORBITAL OVERLAY */}
               <ProjectsOverlay />
@@ -544,4 +557,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;

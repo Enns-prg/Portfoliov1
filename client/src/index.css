@@ -1,15 +1,41 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Optional: Set a default space font for everything */
+/* --- GLOBAL STYLES --- */
 body {
   font-family: 'Rajdhani', sans-serif;
   background-color: black;
+  /* Ensure the scrollbar styles apply to the body */
+  overflow-y: scroll; 
 }
+
+/* --- CUSTOM SCROLLBAR (OPTION 3: DEEP VOID) --- */
+/* Width of the scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Track (Background) - Invisible to blend with space */
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+
+/* Thumb (The moving part) - Faint grey, glass-like */
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2); 
+  border-radius: 10px;
+  transition: background 0.3s ease-in-out;
+}
+
+/* Hover State - Becomes brighter when you grab it */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5); 
+}
+
+/* --- UTILITY ANIMATIONS --- */
 @layer utilities {
   @keyframes scan {
     0% { top: 0%; opacity: 0; }
