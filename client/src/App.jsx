@@ -530,7 +530,7 @@ function App() {
             <Scroll html>
               <HeroSection />
               <AboutMeContent />
-              <SkillsContent />
+      
               
               {/* USE THE ORBITAL OVERLAY */}
               <ProjectsOverlay />
@@ -544,4 +544,4 @@ function App() {
   );
 }
 
-export default App;
+export default App; 
