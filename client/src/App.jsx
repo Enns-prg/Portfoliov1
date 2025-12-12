@@ -7,6 +7,35 @@ import Planet from './components/Planet';
 import Orbit from './components/Orbit';
 import Typewriter from './components/Typewriter';
 
+// --- SOUND MANAGER COMPONENT ---
+// Handles the ambient background loop
+const SoundManager = () => {
+  useEffect(() => {
+    // Create the audio object
+    const audio = new Audio('/assets/sounds/ambient.mp3');
+    audio.loop = true;
+    audio.volume = 0.3; // Lower volume for background
+
+    const playAudio = () => {
+      audio.play().catch(e => console.log("Audio play blocked until interaction"));
+      // Remove listeners once playing starts
+      window.removeEventListener('click', playAudio);
+      window.removeEventListener('scroll', playAudio);
+    };
+
+    // Browsers block autoplay, so we wait for the first user interaction
+    window.addEventListener('click', playAudio);
+    window.addEventListener('scroll', playAudio);
+
+    return () => {
+      audio.pause();
+      window.removeEventListener('click', playAudio);
+      window.removeEventListener('scroll', playAudio);
+    };
+  }, []);
+  return null;
+};
+
 // --- HTML SECTIONS HELPER ---
 const Section = ({ align = 'left', justify = 'center', children }) => (
   <div className={`h-screen w-screen flex flex-col px-20 relative pointer-events-none ${
@@ -21,7 +50,6 @@ const Section = ({ align = 'left', justify = 'center', children }) => (
     </div>
   </div>
 );
-
 
 // --- HERO SECTION ---
 const HeroSection = () => {
@@ -54,59 +82,34 @@ const HeroSection = () => {
   );
 };
 
-// --- ABOUT ME SECTION (COMPACT CYBER-DECK CHIPS) ---
+// --- ABOUT ME SECTION ---
 const AboutMeContent = () => {
-  // Helper to render a "Tech Chip" button
   const ChipButton = ({ href, download, color, label, logo, index, accentColor }) => (
     <a 
       href={href} 
       download={download}
       target={download ? "_self" : "_blank"}
       rel="noopener noreferrer"
-      // CHANGED: 
-      // 1. w-full md:w-auto -> w-fit (Shrinks to content size)
-      // 2. Reduced padding (pr-6 pl-4) to tighten it further
-      className="group relative w-fit h-[50px] bg-zinc-900/80 -skew-x-12 border-l-4 border-white/20 flex items-center pr-6 pl-4 transition-all duration-300 hover:bg-zinc-800 hover:border-yellow-400 hover:skew-x-0 hover:translate-x-2"
+      className="group relative w-fit min-w-[160px] h-[50px] bg-zinc-900/80 -skew-x-12 border-l-4 border-white/20 flex items-center pr-8 pl-5 transition-all duration-300 hover:bg-zinc-800 hover:border-yellow-400 hover:skew-x-0 hover:translate-x-2"
     >
-      {/* Color Accent Bar (Left Side) */}
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${accentColor} transition-all duration-300 group-hover:w-2 group-hover:shadow-[0_0_15px_currentColor]`}></div>
-
-      {/* Content Container */}
-      <div className="flex items-center gap-6"> 
-        
-        {/* Left: Logo & Label */}
-        <div className="flex items-center gap-3">
-          {/* Smaller Logo Container */}
-          <div className="relative w-7 h-7 flex items-center justify-center bg-black/50 rounded p-1 border border-white/5">
-             <img 
-               src={logo} 
-               alt={label} 
-               className={`w-full h-full object-contain ${label === 'GITHUB' ? 'invert' : ''} opacity-70 group-hover:opacity-100 transition-opacity`} 
-             />
+      <div className="flex items-center justify-between w-full gap-6"> 
+        <div className="flex items-center gap-4">
+          <div className="relative w-8 h-8 flex items-center justify-center bg-black/50 rounded p-1.5 border border-white/5">
+             <img src={logo} alt={label} className={`w-full h-full object-contain ${label === 'GITHUB' ? 'invert' : ''} opacity-70 group-hover:opacity-100 transition-opacity`} />
           </div>
           <div className="flex flex-col">
-            <span className={`text-sm font-bold font-['Orbitron'] tracking-widest ${color} group-hover:brightness-125 transition-all`}>
-              {label}
-            </span>
-            {/* Tiny Tech Status Text */}
-            <span className="text-[9px] font-mono text-gray-500 group-hover:text-green-400 transition-colors">
+            <span className={`text-sm font-bold font-['Orbitron'] tracking-widest ${color} group-hover:brightness-125 transition-all whitespace-nowrap`}>{label}</span>
+            <span className="text-[10px] font-mono text-gray-500 group-hover:text-green-400 transition-colors whitespace-nowrap">
               <span className="group-hover:hidden">/// READY</span>
               <span className="hidden group-hover:inline animate-pulse">● CONNECTED</span>
             </span>
           </div>
         </div>
-
-        {/* Right: Serial Number (Decorative) */}
-        {/* Kept visible but closer to text due to w-fit */}
         <div className="hidden md:block text-right">
-          <span className="text-[2rem] leading-none font-bold font-['Rajdhani'] text-white/5 group-hover:text-white/10 transition-colors">
-            0{index}
-          </span>
+          <span className="text-[2.5rem] leading-none font-bold font-['Rajdhani'] text-white/5 group-hover:text-white/10 transition-colors">0{index}</span>
         </div>
-
       </div>
-
-      {/* Corner Tech Detail */}
       <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/20"></div>
       <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20"></div>
     </a>
@@ -115,58 +118,24 @@ const AboutMeContent = () => {
   return (
     <Section align="left">
       <div className="w-[45%] text-white mt-[-5rem] z-10">
-        
-        {/* Profile Image (unchanged) */}
         <div className="relative mb-8 group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-full opacity-30 blur-md group-hover:opacity-70 transition duration-500"></div>     
-               <img 
-            src="/assets/images/me.jpg" 
-            alt="Frederick Ian Aranico" 
-            className="relative w-48 h-48 rounded-full border-2 border-yellow-100/50 object-cover shadow-2xl"
-          />
+          <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-full opacity-30 blur-md group-hover:opacity-70 transition duration-500"></div>    
+          <img src="/assets/images/me.jpg" alt="Frederick Ian Aranico" className="relative w-48 h-48 rounded-full border-2 border-yellow-100/50 object-cover shadow-2xl" />
         </div>
-
         <h3 className="text-4xl font-bold mb-6 font-['Orbitron'] tracking-wide">ABOUT ME</h3>
         <p className="text-xl leading-relaxed text-gray-300 text-justify mb-8 font-['Rajdhani']" style={{ textAlign: 'justify' }}>
          Hi! I’m Frederick Ian Aranico, a Computer Science student and aspiring AI engineer with a strong focus on building practical, data-driven, and AI-powered applications. I enjoy working across the full stack—developing backend systems, crafting intuitive interfaces, and integrating machine learning models that solve real-world problems.
         </p>
-        
-        {/* Data Chips Container */}
-        <div className="flex flex-row flex-wrap gap-3">
-          
-          <ChipButton 
-            href="/resume.pdf" 
-            download={true}
-            label="RESUME" 
-            color="text-yellow-400" 
-            accentColor="bg-yellow-400"
-            logo="/assets/logos/resume.png"
-            index={1}
-          />
-
-          <ChipButton 
-            href="https://github.com/Ennsss" 
-            label="GITHUB" 
-            color="text-gray-200" 
-            accentColor="bg-white"
-            logo="/assets/logos/github.png"
-            index={2}
-          />
-
-          <ChipButton 
-            href="https://www.linkedin.com/in/frederickaranico/" 
-            label="LINKEDIN" 
-            color="text-blue-400" 
-            accentColor="bg-blue-500"
-            logo="/assets/logos/linkedin.jpg"
-            index={3}
-          />
-
+        <div className="flex flex-row flex-wrap gap-4">
+          <ChipButton href="/resume.pdf" download={true} label="RESUME" color="text-yellow-400" accentColor="bg-yellow-400" logo="/assets/logos/resume.png" index={1} />
+          <ChipButton href="https://github.com/Ennsss" label="GITHUB" color="text-gray-200" accentColor="bg-white" logo="/assets/logos/github.png" index={2} />
+          <ChipButton href="https://www.linkedin.com/in/frederickaranico/" label="LINKEDIN" color="text-blue-400" accentColor="bg-blue-500" logo="/assets/logos/linkedin.jpg" index={3} />
         </div>
       </div>
     </Section>
   );
 };
+
 // --- SKILLS SECTION ---
 const SkillsContent = () => {
   const skillGroups = [
@@ -241,12 +210,12 @@ const ScanningSatellite = ({ position, rotation, project, setFocusTarget }) => {
     setHover(true);
     const worldPos = new THREE.Vector3();
     e.object.getWorldPosition(worldPos);
-    setFocusTarget(worldPos);
+    if(setFocusTarget) setFocusTarget(worldPos);
   };
 
   const handlePointerOut = (e) => {
     setHover(false);
-    setFocusTarget(null);
+    if(setFocusTarget) setFocusTarget(null);
   };
 
   return (
@@ -270,73 +239,26 @@ const ScanningSatellite = ({ position, rotation, project, setFocusTarget }) => {
               thickness={0.5} 
             />
           </RoundedBox>
-          
-          {/* Scanner Beam */}
           <mesh ref={scanBarRef} position={[0, 0, bodyD/2 + 0.05]} visible={false}>
              <boxGeometry args={[bodyW + 0.2, 0.05, 0.05]} />
              <meshBasicMaterial color="#00ffff" />
              <pointLight color="#00ffff" intensity={2} distance={2} />
           </mesh>
-
-          {/* UI Layout */}
           <group position={[0, 0, bodyD/2 + 0.02]}>
-            
-            {/* Live Indicator */}
-            <mesh position={[bodyW/2 - 0.4, bodyH/2 - 0.3, 0]}>
-               <circleGeometry args={[0.08]} />
-               <meshBasicMaterial color={hovered ? "#22c55e" : "#555"} />
-            </mesh>
-            <Text position={[bodyW/2 - 0.7, bodyH/2 - 0.3, 0]} fontSize={0.15} color="#22c55e" anchorX="right" anchorY="middle" font={fontBody}>
-              LIVE
-            </Text>
-
-            {/* Title (Slightly smaller than before to prevent edge hitting) */}
-            <Text position={[-bodyW/2 + 0.2, 1, 0]} fontSize={0.32} color="#38bdf8" anchorX="middle" anchorY="left" font={fontTitle}>
-              {project.title.toUpperCase()}
-            </Text>
-
-            {/* Description (Reduced size and moved up slightly) */}
-            <Text 
-              position={[-bodyW/2 + 0.5, 0.25, 0]} 
-              fontSize={0.2} // Reduced from 0.25
-              color="#cbd5e1" 
-              anchorX="left" 
-              anchorY="middle" 
-              maxWidth={bodyW - 0.8}
-              lineHeight={1.4}
-              font={fontBody}
-            >
-              {project.desc}
-            </Text>
-
-            {/* Tech Badges (Moved down to Y = -0.9 to avoid overlap) */}
+            <mesh position={[bodyW/2 - 0.4, bodyH/2 - 0.3, 0]}><circleGeometry args={[0.08]} /><meshBasicMaterial color={hovered ? "#22c55e" : "#555"} /></mesh>
+            <Text position={[bodyW/2 - 0.7, bodyH/2 - 0.3, 0]} fontSize={0.15} color="#22c55e" anchorX="right" anchorY="middle" font={fontBody}>LIVE</Text>
+            <Text position={[-bodyW/2 + 0.3, 0.8, 0]} fontSize={0.35} color="#38bdf8" anchorX="middle" anchorY="left" font={fontTitle}>{project.title.toUpperCase()}</Text>
+            <mesh position={[-bodyW/2 + 0.3, 0.5, 0]}><planeGeometry args={[0.05, 0.8]} /><meshBasicMaterial color="#334155" /></mesh>
+            <Text position={[-bodyW/2 + 0.5, 0.1, 0]} fontSize={0.2} color="#cbd5e1" anchorX="left" anchorY="middle" maxWidth={bodyW - 0.8} lineHeight={1.4} font={fontBody}>{project.desc}</Text>
             {project.tech && project.tech.map((tech, i) => (
-              <group key={i} position={[-bodyW/2 + 0.8 + (i * 1.3), -0.5, 0]}>
-                 <mesh>
-                   {/* Balanced Badge Size */}
-                   <planeGeometry args={[2.5, 0.5]} />
-                   <meshBasicMaterial color="#020617" transparent opacity={0.9} />
-                 </mesh>
-                 <lineSegments>
-                    <edgesGeometry args={[new THREE.PlaneGeometry(1.2, 0.35)]} />
-                    <lineBasicMaterial color="#38bdf8" />
-                 </lineSegments>
-                 {/* Readable White Text */}
-                 <Text position={[0,0,0.01]} fontSize={0.20} color="#23d400ff" font={fontBody}>
-                   {tech}
-                 </Text>
+              <group key={i} position={[-bodyW/2 + 0.8 + (i * 1.3), -0.6, 0]}>
+                 <mesh><planeGeometry args={[1.2, 0.35]} /><meshBasicMaterial color="#020617" transparent opacity={0.9} /></mesh>
+                 <lineSegments><edgesGeometry args={[new THREE.PlaneGeometry(1.2, 0.35)]} /><lineBasicMaterial color="#38bdf8" /></lineSegments>
+                 <Text position={[0,0,0.01]} fontSize={0.16} color="#ffffff" font={fontBody}>{tech}</Text>
               </group>
             ))}
-
-            {/* Footer Action */}
-            <Text position={[-bodyW/2 + 0.3, -bodyH/2 + 0.3, 0]} fontSize={0.25} color="#facc15" anchorX="left" anchorY="bottom" font={fontTitle}>
-              INITIALIZE →
-            </Text>
-             <mesh position={[0, -bodyH/2 + 0.25, 0]}>
-               <planeGeometry args={[bodyW - 0.6, 0.02]} />
-               <meshBasicMaterial color="#facc15" />
-            </mesh>
-
+            <Text position={[-bodyW/2 + 0.3, -bodyH/2 + 0.3, 0]} fontSize={0.25} color="#facc15" anchorX="left" anchorY="bottom" font={fontTitle}>INITIALIZE →</Text>
+             <mesh position={[0, -bodyH/2 + 0.25, 0]}><planeGeometry args={[bodyW - 0.6, 0.02]} /><meshBasicMaterial color="#facc15" /></mesh>
           </group>
         </group>
       </Billboard>
@@ -348,30 +270,10 @@ const DataRing = () => {
   const groupRef = useRef();
   
   const projects = [
-    { 
-      title: "Vigilens", 
-      desc: "Full-stack AI surveillance automating anomaly detection with multi-camera analysis.", 
-      tech: ["PYTHON", "YOLOv11", "REACT"], 
-      link: "hhttps://github.com/Ennsss/Vigilens" 
-    },
-    { 
-      title: "Solaris Web", 
-      desc: "Immersive 3D portfolio featuring reactive physics, orbital navigation, and 'scrollytelling'.", 
-      tech: ["REACT", "THREE.JS", "R3F"], 
-      link: "https://github.com/Enns-prg/Portfoliov1" 
-    },
-    { 
-      title: "Scraping Crusaders", 
-      desc: "AI-powered web scraper leveraging Gemini API for advanced sentiment classification.", 
-      tech: ["FLASK", "GEMINI API", "MONGODB"], 
-      link: "https://github.com/Ennsss/Web-Scrapes" 
-    },
-    { 
-      title: "Sentiment Analysis", 
-      desc: "Recommendation engine optimizing complaint resolution using NLP and secure user profiling.", 
-      tech: ["PYTHON", "TENSORFLOW", "MYSQL"], 
-      link: "https://github.com/Ennsss/Sentiment_Analysis-customer-feedback" 
-    },
+    { title: "Vigilens", desc: "Full-stack AI surveillance automating anomaly detection with multi-camera analysis.", tech: ["PYTHON", "YOLOv11", "REACT"], link: "https://github.com/Ennsss" },
+    { title: "Solaris Web", desc: "Immersive 3D portfolio featuring reactive physics, orbital navigation, and 'scrollytelling'.", tech: ["REACT", "THREE.JS", "R3F"], link: "https://github.com/Ennsss" },
+    { title: "Scraping Crusaders", desc: "AI-powered web scraper leveraging Gemini API for advanced sentiment classification.", tech: ["FLASK", "GEMINI API", "MONGODB"], link: "https://github.com/Ennsss" },
+    { title: "Sentiment Analysis", desc: "Recommendation engine optimizing complaint resolution using NLP and secure user profiling.", tech: ["PYTHON", "TENSORFLOW", "MYSQL"], link: "https://github.com/Ennsss" },
   ];
 
   useFrame((state) => {
@@ -406,63 +308,16 @@ const DataRing = () => {
   );
 };
 
-// --- PROJECTS OVERLAY ---
 const ProjectsOverlay = () => (
   <Section align="center" justify="start">
     <div className="mt-10 text-center pointer-events-none z-10">
-      <h2 className="text-6xl font-black text-cyan-400 mb-2 tracking-tighter font-['Orbitron'] drop-shadow-lg">
-        PROJECTS
-      </h2>
-      <p className="text-white font-mono text-sm tracking-[0.3em] uppercase font-['Rajdhani'] animate-pulse">
-        &lt; GLOBAL DATA RING DETECTED /&gt;
-      </p>
+      <h2 className="text-6xl font-black text-cyan-400 mb-2 tracking-tighter font-['Orbitron'] drop-shadow-lg">PROJECTS</h2>
+      <p className="text-white font-mono text-sm tracking-[0.3em] uppercase font-['Rajdhani'] animate-pulse">&lt; GLOBAL DATA RING DETECTED /&gt;</p>
     </div>
   </Section>
 );
 
-
 // --- EXPERIENCE SECTION (MISSION LOG) ---
-
-// --- 3D SCENE ---
-
-const CameraRig = () => {
-  const scroll = useScroll();
-  useFrame((state) => {
-    const scrollOffset = scroll.offset; 
-    const transitionPhase = THREE.MathUtils.clamp(scrollOffset * 3, 0, 1);
-    const startPos = new THREE.Vector3(0, 20, 25);
-    const endPos = new THREE.Vector3(0, 13, 20); 
-    state.camera.position.lerpVectors(startPos, endPos, transitionPhase);
-    state.camera.lookAt(0, 0, 0);
-  });
-  return null;
-}
-
-const HeroSolarSystem = () => {
-  const scroll = useScroll();
-  const solarSystemRef = useRef();
-  useFrame(() => {
-    if (solarSystemRef.current) {
-      solarSystemRef.current.rotation.y += 0.001; 
-      const scrollOffset = scroll.offset;
-      const targetY = scrollOffset > 0.01 ? 50 : -2; 
-      solarSystemRef.current.position.y = THREE.MathUtils.lerp(
-        solarSystemRef.current.position.y, targetY, 0.05
-      );
-    }
-  });
-  return (
-    <group ref={solarSystemRef} position={[5, -2, 0]}>
-      <Planet name="Sun" scale={3} rotationSpeed={0.002} />
-      <group>
-        <Orbit radius={5} />   <Planet name="Mercury" scale={6} orbitRadius={5} orbitSpeed={1} />
-        <Orbit radius={7} />   <Planet name="Venus" scale={9} orbitRadius={7} orbitSpeed={0.6} />
-        <Orbit radius={10} />  <Planet name="Earth" scale={0.15} orbitRadius={10} orbitSpeed={0.4} />
-        <Orbit radius={12.5} /> <Planet name="Mars" scale={6} orbitRadius={12.5} orbitSpeed={0.3} />
-      </group>
-    </group>
-  );
-};
 const ExperienceContent = () => {
   const missions = [
     {
@@ -492,60 +347,72 @@ const ExperienceContent = () => {
   return (
     <Section align="right">
       <div className="w-[100%] md:w-[55%] ml-auto z-10 flex flex-col gap-8 mr-10">
-        
-        {/* Header */}
         <div className="text-right mb-4">
           <h2 className="text-6xl font-black text-white mb-2 tracking-tighter font-['Orbitron']">MISSION LOG</h2>
-          <p className="text-red-400 font-mono text-sm tracking-[0.3em] uppercase font-['Rajdhani'] animate-pulse">
-            &lt; CAREER TRAJECTORY &gt;
-          </p>
+          <p className="text-red-400 font-mono text-sm tracking-[0.3em] uppercase font-['Rajdhani'] animate-pulse">&lt; CAREER TRAJECTORY &gt;</p>
         </div>
-
-        {/* Experience Cards */}
         <div className="flex flex-col gap-6">
           {missions.map((mission) => (
-            <div 
-              key={mission.id}
-              className={`relative group p-6 bg-zinc-900/90 backdrop-blur-md border-r-4 ${mission.border} border-y border-l border-white/10 transition-all duration-300 hover:-translate-x-2 hover:shadow-[0_0_30px_rgba(0,0,0,0.5)]`}
-            >
-              {/* Header: Role & Date */}
+            <div key={mission.id} className={`relative group p-6 bg-zinc-900/90 backdrop-blur-md border-r-4 ${mission.border} border-y border-l border-white/10 transition-all duration-300 hover:-translate-x-2 hover:shadow-[0_0_30px_rgba(0,0,0,0.5)]`}>
               <div className="flex justify-between items-start mb-4 border-b border-white/10 pb-4">
                 <div>
                   <h3 className={`text-2xl font-bold font-['Orbitron'] ${mission.color} mb-1`}>{mission.role}</h3>
-                  <div className="flex items-center gap-2 text-white/60 font-mono text-sm">
-                    <span className="w-2 h-2 rounded-full bg-white/40"></span>
-                    {mission.org}
-                  </div>
+                  <div className="flex items-center gap-2 text-white/60 font-mono text-sm"><span className="w-2 h-2 rounded-full bg-white/40"></span>{mission.org}</div>
                 </div>
                 <div className="text-right">
                   <span className="block text-4xl font-bold font-['Rajdhani'] text-white/5 absolute top-4 right-4">{mission.id}</span>
                   <span className="text-sm font-mono text-gray-400 bg-black/50 px-2 py-1 rounded">{mission.date}</span>
                 </div>
               </div>
-
-              {/* Body: Description */}
-              <p className="text-gray-300 font-['Rajdhani'] text-lg leading-relaxed mb-6 text-justify">
-                {mission.desc}
-              </p>
-
-              {/* Footer: Stats/Tags */}
+              <p className="text-gray-300 font-['Rajdhani'] text-lg leading-relaxed mb-6 text-justify">{mission.desc}</p>
               <div className="flex gap-3">
-                {mission.stats.map((stat, i) => (
-                  <span key={i} className={`px-3 py-1 text-xs font-bold font-['Orbitron'] rounded-sm ${mission.bg} ${mission.color} border border-white/5`}>
-                    {stat}
-                  </span>
-                ))}
+                {mission.stats.map((stat, i) => (<span key={i} className={`px-3 py-1 text-xs font-bold font-['Orbitron'] rounded-sm ${mission.bg} ${mission.color} border border-white/5`}>{stat}</span>))}
               </div>
-
-              {/* Corner Accents */}
               <div className="absolute -left-[1px] -top-[1px] w-3 h-3 border-l border-t border-white/50"></div>
               <div className="absolute -right-[1px] -bottom-[1px] w-3 h-3 border-r border-b border-white/50"></div>
             </div>
           ))}
         </div>
-
       </div>
     </Section>
+  );
+};
+
+// --- 3D SCENE ---
+const CameraRig = () => {
+  const scroll = useScroll();
+  useFrame((state) => {
+    const scrollOffset = scroll.offset; 
+    const transitionPhase = THREE.MathUtils.clamp(scrollOffset * 3, 0, 1);
+    const startPos = new THREE.Vector3(0, 20, 25);
+    const endPos = new THREE.Vector3(0, 13, 20); 
+    state.camera.position.lerpVectors(startPos, endPos, transitionPhase);
+    state.camera.lookAt(0, 0, 0);
+  });
+  return null;
+}
+
+const HeroSolarSystem = () => {
+  const scroll = useScroll();
+  const solarSystemRef = useRef();
+  useFrame(() => {
+    if (solarSystemRef.current) {
+      solarSystemRef.current.rotation.y += 0.001; 
+      const scrollOffset = scroll.offset;
+      const targetY = scrollOffset > 0.01 ? 50 : -2; 
+      solarSystemRef.current.position.y = THREE.MathUtils.lerp(solarSystemRef.current.position.y, targetY, 0.05);
+    }
+  });
+  return (
+    <group ref={solarSystemRef} position={[5, -2, 0]}>
+      <Planet name="Sun" scale={3} rotationSpeed={0.002} />
+      <group>
+        <Orbit radius={5} />   <Planet name="Mercury" scale={6} orbitRadius={5} orbitSpeed={1} />
+        <Orbit radius={7} />   <Planet name="Venus" scale={9} orbitRadius={7} orbitSpeed={0.6} />
+        <Orbit radius={10} />  <Planet name="Earth" scale={0.15} orbitRadius={10} orbitSpeed={0.4} />
+        <Orbit radius={12.5} /> <Planet name="Mars" scale={6} orbitRadius={12.5} orbitSpeed={0.3} />
+      </group>
+    </group>
   );
 };
 
@@ -553,13 +420,18 @@ const ContentPlanets = () => {
   const { viewport } = useThree();
   const scroll = useScroll(); 
   const groupRef = useRef();
-  
   const xOffset = viewport.width / 10; 
+
+  // --- AUDIO LOGIC FOR CLICKS ---
+  const clickSound = useMemo(() => new Audio('/assets/sounds/click.wav'), []);
+  const playClick = () => {
+    clickSound.currentTime = 0;
+    clickSound.play().catch(e => console.error(e));
+  };
 
   const planets = useMemo(() => [
     { name: "Mercury", scale: 54, position: [xOffset, -viewport.height * 1, 0] },
     { name: "Venus",   scale: 35, position: [-xOffset, -viewport.height * 2, 0] },
-    // EARTH PROPORTIONS FIXED: 1.5 Scale (Big), Centered X, Lowered Y
     { name: "Earth",   scale: 0.45, position: [0, -viewport.height * 3, 0] }, 
     { name: "Mars",    scale: 34, position: [-xOffset, -viewport.height * 4, 0] },
   ], [viewport, xOffset]);
@@ -577,19 +449,15 @@ const ContentPlanets = () => {
     <group ref={groupRef} scale={[0, 0, 0]}>
       {planets.map((p, i) => (
         <group key={i} position={p.position}>
-          {/* RENDER THE PLANET */}
           <Planet 
             name={p.name} 
             scale={p.scale} 
             rotationSpeed={0.01} 
-            // Removed blackHolePosRef prop
+            // Pass the audio handler to the Planet
+            onPlanetClick={playClick}
           />
           <pointLight distance={10} intensity={4} color="white" />
-
-          {/* IF EARTH: RENDER THE DATA RING AROUND IT */}
-          {p.name === 'Earth' && (
-            <DataRing />
-          )}
+          {p.name === 'Earth' && <DataRing />}
         </group>
       ))}
     </group>
@@ -597,10 +465,9 @@ const ContentPlanets = () => {
 };
 
 function App() {
-  // Removed blackHolePosRef
-
   return (
     <div className="fixed inset-0 bg-black">
+      <SoundManager />
       <Canvas shadows camera={{ position: [0, 20, 25], fov: 45 }}>
         <ambientLight intensity={0.5} />
         <pointLight position={[0, 0, 0]} intensity={2} color="white" />
@@ -611,20 +478,37 @@ function App() {
           <ScrollControls pages={5} damping={0.3}>
             <CameraRig />
             <HeroSolarSystem />
-            {/* Removed BlackHole3D */}
             
             <Scroll>
               <ContentPlanets />
             </Scroll>
 
+            {/* --- HTML OVERLAYS (FIXED POSITIONING) --- */}
             <Scroll html>
-              <HeroSection />
-              <AboutMeContent />
-              <SkillsContent />
-             
-              {/* USE THE ORBITAL OVERLAY */}
-              <ProjectsOverlay />
-               <ExperienceContent />
+              {/* PAGE 1: HERO */}
+              <div style={{ position: 'absolute', top: '0vh', width: '100vw' }}>
+                <HeroSection />
+              </div>
+
+              {/* PAGE 2: ABOUT ME */}
+              <div style={{ position: 'absolute', top: '100vh', width: '100vw' }}>
+                <AboutMeContent />
+              </div>
+
+              {/* PAGE 3: SKILLS */}
+              <div style={{ position: 'absolute', top: '200vh', width: '100vw' }}>
+                <SkillsContent />
+              </div>
+              
+              {/* PAGE 4: PROJECTS (EARTH) */}
+              <div style={{ position: 'absolute', top: '300vh', width: '100vw' }}>
+                <ProjectsOverlay />
+              </div>
+              
+              {/* PAGE 5: EXPERIENCE (MARS) */}
+              <div style={{ position: 'absolute', top: '400vh', width: '100vw' }}>
+                <ExperienceContent />
+              </div>
             </Scroll>
           </ScrollControls>
         </Suspense>
