@@ -211,13 +211,12 @@ const SkillsContent = () => {
   );
 };
 
-// --- SCANNING SATELLITE (WITH LOCAL FONTS) ---
-
-const ScanningSatellite = ({ position, rotation, project }) => {
+// --- SCANNING SATELLITE (BALANCED LAYOUT) ---
+const ScanningSatellite = ({ position, rotation, project, setFocusTarget }) => {
   const [hovered, setHover] = useState(false);
   const scanBarRef = useRef();
   
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (scanBarRef.current) {
       if (hovered) {
         const time = state.clock.elapsedTime * 2;
@@ -234,16 +233,28 @@ const ScanningSatellite = ({ position, rotation, project }) => {
   const bodyH = 3.5;
   const bodyD = 0.2;
 
-  // IMPORTANT: Ensure you have these files in public/fonts/
   const fontTitle = "/fonts/Orbitron-Bold.ttf";
   const fontBody = "/fonts/Rajdhani-Medium.ttf";
 
+  const handlePointerOver = (e) => {
+    e.stopPropagation();
+    setHover(true);
+    const worldPos = new THREE.Vector3();
+    e.object.getWorldPosition(worldPos);
+    setFocusTarget(worldPos);
+  };
+
+  const handlePointerOut = (e) => {
+    setHover(false);
+    setFocusTarget(null);
+  };
+
   return (
     <group position={position} rotation={rotation}>
-      <Billboard follow={true} lockX={false} lockY={false} lockZ={false}>``
+      <Billboard follow={true} lockX={false} lockY={false} lockZ={false}>
         <group 
-          onPointerOver={() => setHover(true)} 
-          onPointerOut={() => setHover(false)}
+          onPointerOver={handlePointerOver} 
+          onPointerOut={handlePointerOut}
           onClick={() => window.open(project.link, '_blank')}
           scale={hovered ? 1.05 : 1}
         >
@@ -275,39 +286,19 @@ const ScanningSatellite = ({ position, rotation, project }) => {
                <circleGeometry args={[0.08]} />
                <meshBasicMaterial color={hovered ? "#22c55e" : "#555"} />
             </mesh>
-            <Text 
-              position={[bodyW/2 - 0.7, bodyH/2 - 0.3, 0]} 
-              fontSize={0.15} 
-              color="#22c55e" 
-              anchorX="right" 
-              anchorY="middle"
-              font={fontBody}
-            >
+            <Text position={[bodyW/2 - 0.7, bodyH/2 - 0.3, 0]} fontSize={0.15} color="#22c55e" anchorX="right" anchorY="middle" font={fontBody}>
               LIVE
             </Text>
 
-            {/* TITLE (Orbitron) */}
-            <Text 
-              position={[-bodyW/2 + 0.3, 0.7, 0]} 
-              fontSize={0.35} 
-              color="#38bdf8" 
-              anchorX="middle" 
-              anchorY="left" 
-              font={fontTitle}
-            >
+            {/* Title (Slightly smaller than before to prevent edge hitting) */}
+            <Text position={[-bodyW/2 + 0.2, 1, 0]} fontSize={0.32} color="#38bdf8" anchorX="middle" anchorY="left" font={fontTitle}>
               {project.title.toUpperCase()}
             </Text>
 
-            {/* Divider */}
-            <mesh position={[-bodyW/2 + 0.3, 0.4, 0]}>
-               <planeGeometry args={[0.05, 0.8]} />
-               <meshBasicMaterial color="#334155" />
-            </mesh>
-
-            {/* Description (Rajdhani) */}
+            {/* Description (Reduced size and moved up slightly) */}
             <Text 
-              position={[-bodyW/2 + 0.5, 0, 0]} 
-              fontSize={0.2} 
+              position={[-bodyW/2 + 0.5, 0.25, 0]} 
+              fontSize={0.2} // Reduced from 0.25
               color="#cbd5e1" 
               anchorX="left" 
               anchorY="middle" 
@@ -318,32 +309,27 @@ const ScanningSatellite = ({ position, rotation, project }) => {
               {project.desc}
             </Text>
 
-            {/* Tech Badges */}
+            {/* Tech Badges (Moved down to Y = -0.9 to avoid overlap) */}
             {project.tech && project.tech.map((tech, i) => (
-              <group key={i} position={[-bodyW/2 + 0.6 + (i * 1.2), -0.8, 0]}>
+              <group key={i} position={[-bodyW/2 + 0.8 + (i * 1.3), -0.5, 0]}>
                  <mesh>
-                   <planeGeometry args={[1.0, 0.3]} />
-                   <meshBasicMaterial color="#1e293b" transparent opacity={0.8} />
+                   {/* Balanced Badge Size */}
+                   <planeGeometry args={[2.5, 0.5]} />
+                   <meshBasicMaterial color="#020617" transparent opacity={0.9} />
                  </mesh>
                  <lineSegments>
-                    <edgesGeometry args={[new THREE.PlaneGeometry(1.0, 0.3)]} />
+                    <edgesGeometry args={[new THREE.PlaneGeometry(1.2, 0.35)]} />
                     <lineBasicMaterial color="#38bdf8" />
                  </lineSegments>
-                 <Text position={[0,0,0.01]} fontSize={0.12} color="#38bdf8" font={fontBody}>
+                 {/* Readable White Text */}
+                 <Text position={[0,0,0.01]} fontSize={0.20} color="#23d400ff" font={fontBody}>
                    {tech}
                  </Text>
               </group>
             ))}
 
             {/* Footer Action */}
-            <Text 
-              position={[-bodyW/2 + 0.3, -bodyH/2 + 0.3, 0]} 
-              fontSize={0.25} 
-              color="#facc15" 
-              anchorX="left" 
-              anchorY="bottom"
-              font={fontTitle}
-            >
+            <Text position={[-bodyW/2 + 0.3, -bodyH/2 + 0.3, 0]} fontSize={0.25} color="#facc15" anchorX="left" anchorY="bottom" font={fontTitle}>
               INITIALIZE →
             </Text>
              <mesh position={[0, -bodyH/2 + 0.25, 0]}>
@@ -362,10 +348,30 @@ const DataRing = () => {
   const groupRef = useRef();
   
   const projects = [
-    { title: "AI Sentinel", desc: "Real-time hazard detection using YOLOv11 & OpenCV analysis.", tech: ["PYTHON", "YOLO", "OPENCV"], link: "https://github.com/Ennsss" },
-    { title: "Solaris Web", desc: "Immersive 3D portfolio powered by React Three Fiber.", tech: ["REACT", "R3F", "THREEJS"], link: "https://github.com/Ennsss" },
-    { title: "Crypto Bot", desc: "Predictive algorithmic trading using TensorFlow LSTM models.", tech: ["PYTHON", "TF", "PANDAS"], link: "https://github.com/Ennsss" },
-    { title: "Nexus DB", desc: "High-performance distributed database system written in Go.", tech: ["GO", "SQL", "DOCKER"], link: "https://github.com/Ennsss" },
+    { 
+      title: "Vigilens", 
+      desc: "Full-stack AI surveillance automating anomaly detection with multi-camera analysis.", 
+      tech: ["PYTHON", "YOLOv11", "REACT"], 
+      link: "hhttps://github.com/Ennsss/Vigilens" 
+    },
+    { 
+      title: "Solaris Web", 
+      desc: "Immersive 3D portfolio featuring reactive physics, orbital navigation, and 'scrollytelling'.", 
+      tech: ["REACT", "THREE.JS", "R3F"], 
+      link: "https://github.com/Enns-prg/Portfoliov1" 
+    },
+    { 
+      title: "Scraping Crusaders", 
+      desc: "AI-powered web scraper leveraging Gemini API for advanced sentiment classification.", 
+      tech: ["FLASK", "GEMINI API", "MONGODB"], 
+      link: "https://github.com/Ennsss/Web-Scrapes" 
+    },
+    { 
+      title: "Sentiment Analysis", 
+      desc: "Recommendation engine optimizing complaint resolution using NLP and secure user profiling.", 
+      tech: ["PYTHON", "TENSORFLOW", "MYSQL"], 
+      link: "https://github.com/Ennsss/Sentiment_Analysis-customer-feedback" 
+    },
   ];
 
   useFrame((state) => {
@@ -377,8 +383,6 @@ const DataRing = () => {
   const radius = 8; 
 
   return (
-    // CHANGED: rotation X from 0.5 to 1.3
-    // This tilts the ring up so it faces the camera directly
     <group ref={groupRef} rotation={[0, 20, 0]}> 
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[radius - 0.05, radius + 0.05, 128]} />
@@ -394,7 +398,7 @@ const DataRing = () => {
           <ScanningSatellite 
             key={i} 
             position={[x, 0, z]} 
-            project={proj}a   
+            project={proj}
           />
         );
       })}
