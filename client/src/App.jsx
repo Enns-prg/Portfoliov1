@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { ScrollControls, Scroll, useScroll, Html, Billboard, Text, RoundedBox } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing'; // IMPORT BLOOM
 import * as THREE from 'three';
+import { useForm, ValidationError } from '@formspree/react';
 import Starfield from './components/Starfield';
 import Planet from './components/Planet';
 import Orbit from './components/Orbit';
@@ -61,17 +62,18 @@ const SoundController = () => {
     </div>
   );
 };
-
-// --- HTML SECTIONS HELPER ---
+// --- HTML SECTIONS HELPER (Updated for Mobile) ---
 const Section = ({ align = 'left', justify = 'center', children }) => (
-  <div className={`h-screen w-screen flex flex-col px-20 relative pointer-events-none ${
-    align === 'right' ? 'items-end' : 
-    align === 'left' ? 'items-start' : 'items-center'
+  <div className={`h-screen w-screen flex flex-col px-6 md:px-20 relative pointer-events-none ${
+    // On mobile, we align items to center. On desktop, we respect the 'align' prop.
+    align === 'right' ? 'items-center md:items-end' : 
+    align === 'left' ? 'items-center md:items-start' : 'items-center'
   } ${
     justify === 'center' ? 'justify-center' : 
     justify === 'start' ? 'justify-start' : 'justify-end'
   }`}>
-    <div className="pointer-events-auto">
+    {/* Ensure the inner container takes full width on mobile but auto width on desktop */}
+    <div className="pointer-events-auto w-full md:w-auto">
       {children}
     </div>
   </div>
@@ -101,6 +103,7 @@ const HeroSection = () => {
 };
 
 // --- ABOUT ME SECTION ---
+// --- ABOUT ME SECTION (Mobile Responsive) ---
 const AboutMeContent = () => {
   const ChipButton = ({ href, download, color, label, logo, index, accentColor }) => (
     <a href={href} download={download} target={download ? "_self" : "_blank"} rel="noopener noreferrer" className="group relative w-fit h-[50px] bg-zinc-900/80 -skew-x-12 border-l-4 border-white/20 flex items-center pr-6 pl-4 transition-all duration-300 hover:bg-zinc-800 hover:border-yellow-400 hover:skew-x-0 hover:translate-x-2">
@@ -129,16 +132,24 @@ const AboutMeContent = () => {
 
   return (
     <Section align="left">
-      <div className="w-[45%] text-white mt-[-5rem] z-10">
-        <div className="relative mb-8 group">
+      <div className="w-full md:w-[50%] lg:w-[45%] text-white mt-0 md:mt-[-5rem] z-10 flex flex-col items-center md:items-start">
+        <div className="relative mb-6 md:mb-8 group">
           <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-full opacity-30 blur-md group-hover:opacity-70 transition duration-500"></div>    
-          <img src="/assets/images/me.jpg" alt="Frederick Ian Aranico" className="relative w-48 h-48 rounded-full border-2 border-yellow-100/50 object-cover shadow-2xl" />
+          <img 
+            src="/assets/images/me.jpg" 
+            alt="Frederick Ian Aranico" 
+            className="relative w-32 h-32 md:w-48 md:h-48 rounded-full border-2 border-yellow-100/50 object-cover shadow-2xl" 
+          />
         </div>
-        <h3 className="text-4xl font-bold mb-6 font-['Orbitron'] tracking-wide">ABOUT ME</h3>
-        <p className="text-xl leading-relaxed text-gray-300 text-justify mb-8 font-['Rajdhani']" style={{ textAlign: 'justify' }}>
+        <h3 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6 font-['Orbitron'] tracking-wide text-center md:text-left">
+          ABOUT ME
+        </h3>
+        <p 
+          className="text-sm md:text-xl leading-relaxed text-gray-300 mb-6 md:mb-8 font-['Rajdhani'] text-center md:text-justify"
+        >
          Hi! I’m Frederick Ian Aranico, a Computer Science student and aspiring AI engineer with a strong focus on building practical, data-driven, and AI-powered applications. I enjoy working across the full stack—developing backend systems, crafting intuitive interfaces, and integrating machine learning models that solve real-world problems.
         </p>
-        <div className="flex flex-row flex-wrap gap-3">
+        <div className="flex flex-row flex-wrap gap-3 justify-center md:justify-start">
           <ChipButton href="/resume.pdf" download={true} label="RESUME" color="text-yellow-400" accentColor="bg-yellow-400" logo="/assets/logos/resume.png" index={1} />
           <ChipButton href="https://github.com/Ennsss" label="GITHUB" color="text-gray-200" accentColor="bg-white" logo="/assets/logos/github.png" index={2} />
           <ChipButton href="https://www.linkedin.com/in/frederickaranico/" label="LINKEDIN" color="text-blue-400" accentColor="bg-blue-500" logo="/assets/logos/linkedin.jpg" index={3} />
@@ -358,6 +369,95 @@ const ExperienceContent = () => {
     </Section>
   );
 };
+// --- CONTACT SECTION (Mobile Responsive) ---
+const ContactSection = () => {
+  // REPLACE "YOUR_FORM_ID" WITH YOUR ACTUAL FORMSPREE ID
+  const [state, handleSubmit] = useForm("manrkbyr");
+
+  return (
+    <Section align="center" justify="center">
+      <div className="z-10 w-full max-w-xl px-4 md:px-0 mt-[-5rem]">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h2 className="text-4xl md:text-6xl font-black text-white mb-2 tracking-tighter font-['Orbitron']">
+            CONTACT ME
+          </h2>
+          <p className="text-green-400 font-mono text-sm tracking-[0.3em] uppercase font-['Rajdhani'] animate-pulse">
+            &lt; OPEN FREQUENCY /&gt;
+          </p>
+        </div>
+
+        {/* Success Message */}
+        {state.succeeded ? (
+          <div className="bg-green-500/10 border border-green-500 text-green-400 p-6 rounded text-center backdrop-blur-md">
+            <h3 className="text-2xl font-bold font-['Orbitron'] mb-2">TRANSMISSION RECEIVED</h3>
+            <p className="font-['Rajdhani']">I will respond to your signal shortly.</p>
+          </div>
+        ) : (
+          /* Contact Form */
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-zinc-900/80 p-6 md:p-8 rounded-lg border border-white/10 backdrop-blur-md shadow-2xl relative">
+             <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/30"></div>
+             <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/30"></div>
+             <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white/30"></div>
+             <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/30"></div>
+
+            {/* Name Input */}
+            <div className="flex flex-col gap-1">
+              <label htmlFor="name" className="text-yellow-400 font-['Orbitron'] text-xs tracking-widest">IDENTITY</label>
+              <input
+                id="name"
+                type="text"
+                name="name"
+                placeholder="ENTER NAME"
+                required
+                className="bg-black/50 border border-white/20 p-3 text-white font-['Rajdhani'] focus:outline-none focus:border-yellow-400 transition-colors"
+              />
+              <ValidationError prefix="Name" field="name" errors={state.errors} className="text-red-400 text-xs" />
+            </div>
+
+            {/* Email Input */}
+            <div className="flex flex-col gap-1">
+              <label htmlFor="email" className="text-blue-400 font-['Orbitron'] text-xs tracking-widest">FREQUENCY (EMAIL)</label>
+              <input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="ENTER EMAIL"
+                required
+                className="bg-black/50 border border-white/20 p-3 text-white font-['Rajdhani'] focus:outline-none focus:border-blue-400 transition-colors"
+              />
+              <ValidationError prefix="Email" field="email" errors={state.errors} className="text-red-400 text-xs" />
+            </div>
+
+            {/* Message Input */}
+            <div className="flex flex-col gap-1">
+              <label htmlFor="message" className="text-green-400 font-['Orbitron'] text-xs tracking-widest">DATA PACKET</label>
+              <textarea
+                id="message"
+                name="message"
+                rows="4"
+                placeholder="ENTER MESSAGE..."
+                required
+                className="bg-black/50 border border-white/20 p-3 text-white font-['Rajdhani'] focus:outline-none focus:border-green-400 transition-colors resize-none"
+              />
+              <ValidationError prefix="Message" field="message" errors={state.errors} className="text-red-400 text-xs" />
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={state.submitting}
+              className="mt-4 py-3 bg-white/10 border border-white/20 text-white font-bold font-['Orbitron'] tracking-widest hover:bg-white hover:text-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group relative overflow-hidden"
+            >
+              <span className="relative z-10">{state.submitting ? 'SENDING...' : 'INITIATE UPLOAD'}</span>
+              <div className="absolute inset-0 bg-yellow-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 z-0"></div>
+            </button>
+          </form>
+        )}
+      </div>
+    </Section>
+  );
+};
 
 // --- 3D SCENE ---
 const CameraRig = () => {
@@ -389,7 +489,6 @@ const HeroSolarSystem = () => {
   });
   return (
     <group ref={solarSystemRef} position={[5, -2, 0]}>
-      {/* GLOWING ENABLED FOR THESE PLANETS */}
       <Planet name="Sun" scale={3} rotationSpeed={0.002} glowing={true} />
       <group>
         <Orbit radius={5} />   <Planet name="Mercury" scale={6} orbitRadius={5} orbitSpeed={1} glowing={true} />
@@ -437,7 +536,6 @@ const ContentPlanets = () => {
             scale={p.scale} 
             rotationSpeed={0.01} 
             onPlanetClick={playClick} 
-            // glowing={false} by default, so these WON'T bloom
           />
           <pointLight distance={10} intensity={4} color="white" />
           {p.name === 'Earth' && <DataRing />}
@@ -458,11 +556,9 @@ function App() {
         
         <Suspense fallback={null}>
           <Starfield />
-          
-          <ScrollControls pages={5} damping={0.3}>
+          <ScrollControls pages={6} damping={0.3}>
             <CameraRig />
             
-            {/* THIS COMPONENT HAS THE GLOWING PLANETS */}
             <HeroSolarSystem />
             
             <Scroll>
@@ -475,10 +571,10 @@ function App() {
               <div style={{ position: 'absolute', top: '200vh', width: '100vw' }}> <SkillsContent /> </div>
               <div style={{ position: 'absolute', top: '300vh', width: '100vw' }}> <ProjectsOverlay /> </div>
               <div style={{ position: 'absolute', top: '400vh', width: '100vw' }}> <ExperienceContent /> </div>
+              <div style={{ position: 'absolute', top: '500vh', width: '100vw' }}> <ContactSection /> </div>
             </Scroll>
           </ScrollControls>
           
-          {/* POST PROCESSING: High threshold ensures only glowing=true planets bloom */}
           <EffectComposer disableNormalPass>
             <Bloom luminanceThreshold={1} mipmapBlur intensity={1.5} />
           </EffectComposer>
