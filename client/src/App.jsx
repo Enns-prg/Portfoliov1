@@ -147,38 +147,38 @@ const AboutMeContent = () => {
   );
 };
 
-// --- SKILLS SECTION ---
+// --- SKILLS SECTION (Mobile Responsive) ---
 const SkillsContent = () => {
   const skillGroups = [
-    { category: "LANGUAGES", color: "text-yellow-400", accent: "border-yellow-400", bgHover: "hover:bg-yellow-400/10", skills: ["Python", "JavaScript", "C#", "C++", "HTML/CSS"] },
-    { category: "AI & DATA", color: "text-red-400", accent: "border-red-400", bgHover: "hover:bg-red-400/10", skills: ["TensorFlow", "YOLOv11", "Gemini API", "Pandas"] },
-    { category: "FRAMEWORKS", color: "text-blue-400", accent: "border-blue-400", bgHover: "hover:bg-blue-400/10", skills: ["React", "Node.js", "Flask", "Django", "Three.js"] },
-    { category: "TOOLS", color: "text-green-400", accent: "border-green-400", bgHover: "hover:bg-green-400/10", skills: ["MySQL", "MongoDB", "AWS", "Git"] }
+    { category: "LANGUAGES", color: "text-yellow-400", accent: "border-yellow-400", bgHover: "hover:bg-yellow-400/10", skills: ["Python", "JavaScript", "C#", "C++", "Java", "HTML/CSS"] },
+    { category: "AI & DATA", color: "text-red-400", accent: "border-red-400", bgHover: "hover:bg-red-400/10", skills: ["TensorFlow", "YOLOv11", "Gemini API", "Pandas", "OpenCV"] },
+    { category: "FRAMEWORKS ", color: "text-blue-400", accent: "border-blue-400", bgHover: "hover:bg-blue-400/10", skills: ["React", "Node.js", "Flask", "Django", "ASP.NET", "Three.js"] },
+    { category: "TOOLS & DB", color: "text-green-400", accent: "border-green-400", bgHover: "hover:bg-green-400/10", skills: ["MySQL", "MongoDB", "AWS", "Git", "Postman"] }
   ];
 
   return (
     <Section align="right">
-      <div className="w-full md:w-[60%] lg:w-[50%] ml-auto flex flex-col items-start z-10 pointer-events-none md:pl-10">
-        <div className="mb-6 md:mb-10 pl-4 border-l-2 border-white/20">
-          <h2 className="text-4xl md:text-6xl font-black text-white mb-1 tracking-tighter font-['Orbitron']">SKILLS</h2>
-          <div className="flex items-center gap-3 text-gray-400 font-mono text-xs md:text-sm tracking-[0.3em] uppercase font-tech">
+      <div className="w-[100%] ml-auto flex flex-col items-start z-10 pointer-events-none pl-10">
+        <div className="mb-10 pl-4 border-l-2 border-white/20">
+          <h2 className="text-6xl font-black text-white mb-1 tracking-tighter font-['Orbitron']"> SKILLS</h2>
+          <div className="flex items-center gap-3 text-gray-400 font-mono text-sm tracking-[0.3em] uppercase font-tech">
              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
              System Status: Online
           </div>
         </div>
-        <div className="w-full flex flex-col gap-4 md:gap-6 pointer-events-auto">
+        <div className="w-full flex flex-col gap-6 pointer-events-auto">
           {skillGroups.map((group, idx) => (
-            <div key={idx} className={`group relative w-full p-4 md:p-6 transition-all duration-500 hover:translate-x-2 md:hover:translate-x-4 bg-zinc-900/50 md:bg-transparent`}>
-              <div className={`absolute inset-0 bg-gradient-to-r from-white/5 to-transparent -skew-x-0 md:-skew-x-12 border-l-4 ${group.accent} ${group.bgHover} transition-colors duration-300`}></div>
-              <div className="relative flex flex-col gap-2 md:gap-3">
-                <h4 className={`text-lg md:text-2xl font-bold font-['Orbitron'] ${group.color} flex items-center gap-3 tracking-widest`}>
+            <div key={idx} className={`group relative w-full p-6 transition-all duration-500 hover:translate-x-4`}>
+              <div className={`absolute inset-0 bg-gradient-to-r from-white/5 to-transparent -skew-x-12 border-l-4 ${group.accent} ${group.bgHover} transition-colors duration-300`}></div>
+              <div className="relative flex flex-col gap-3">
+                <h4 className={`text-2xl font-bold font-['Orbitron'] ${group.color} flex items-center gap-3 tracking-widest`}>
                   <span className="text-sm opacity-50 font-['Rajdhani']">0{idx + 1} //</span> {group.category}
                 </h4>
-                <div className="flex flex-wrap gap-x-4 md:gap-x-6 gap-y-2 ml-0 md:ml-10">
+                <div className="flex flex-wrap gap-x-6 gap-y-2 ml-10">
                   {group.skills.map((skill, sIdx) => (
                     <div key={sIdx} className="group/skill flex items-center gap-2">
                       <span className={`w-1 h-1 rounded-full bg-white/30 group-hover/skill:bg-white transition-colors`}></span>
-                      <span className="text-gray-300 font-['Rajdhani'] font-bold text-xs md:text-sm group-hover/skill:text-white transition-all cursor-default">{skill}</span>
+                      <span className="text-gray-300 font-['Rajdhani'] font-bold text-sm group-hover/skill:text-white group-hover/skill:shadow-[0_0_10px_white] transition-all cursor-default">{skill}</span>
                     </div>
                   ))}
                 </div>
@@ -190,7 +190,6 @@ const SkillsContent = () => {
     </Section>
   );
 };
-
 // --- SCANNING SATELLITE (3D) ---
 const ScanningSatellite = ({ position, rotation, project, setFocusTarget }) => {
   const [hovered, setHover] = useState(false);
