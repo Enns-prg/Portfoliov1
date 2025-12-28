@@ -11,10 +11,30 @@ import Typewriter from './components/Typewriter';
 
 // --- DATA: PROJECTS (Shared between 3D and Mobile HTML) ---
 const PROJECT_DATA = [
-  { title: "Vigilens", desc: "Full-stack AI surveillance automating anomaly detection.", tech: ["PYTHON", "YOLOv11", "REACT"], link: "https://github.com/Ennsss" },
-  { title: "Solaris Web", desc: "Immersive 3D portfolio featuring reactive physics.", tech: ["REACT", "THREE.JS", "R3F"], link: "https://github.com/Ennsss" },
-  { title: "Scraping Crusaders", desc: "AI-powered web scraper with Gemini API sentiment analysis.", tech: ["FLASK", "GEMINI", "MONGO"], link: "https://github.com/Ennsss" },
-  { title: "Sentiment Analysis", desc: "Recommendation engine optimizing complaint resolution.", tech: ["PYTHON", "TF", "MYSQL"], link: "https://github.com/Ennsss" },
+  {
+    title: "Vigilens",
+    desc: "A comprehensive automated surveillance system designed to enhance security through intelligent monitoring. It utilizes custom AI models built with YOLOv11 to detect anomalies and track objects in real-time, significantly reducing manual oversight. ",
+    tech: ["Python", "React", "YOLOv11", "MySQL"],
+    link: "https://github.com/Ennsss"
+  },
+  {
+    title: "Scraping Crusaders",
+    desc: "An advanced web scraping and analysis tool designed to extract meaningful data from diverse online sources. Built using Flask and MongoDB, it aggregates raw data and employs the Gemini API to perform sentiment analysis, turning scattered information into actionable business insights.",
+    tech: ["Flask", "MongoDB", "Gemini API"],
+    link: "https://github.com/Ennsss"
+  },
+  {
+    title: "AI Sentiment Analysis",
+    desc: "A data-driven recommendation engine focused on optimizing customer support processes. By analyzing large volumes of feedback using Python and TensorFlow, the system categorizes sentiment and suggests tailored responses for complaint resolution.",
+    tech: ["Python", "React", "MySQL", "TensorFlow"],
+    link: "https://github.com/Ennsss"
+  },
+  {
+    title: "Solaris Web",
+    desc: "An immersive 3D portfolio website that showcases the potential of modern interactive web design. Developed with React and Tailwind CSS, it features a physics-based solar system environment powered by Three.js (R3F).",
+    tech: ["React", "Tailwind CSS", "Three.js"],
+    link: "https://github.com/Ennsss"
+  },
 ];
 
 // --- 1. SOUND CONTROLLER ---
@@ -125,8 +145,8 @@ const AboutMeContent = () => {
     </svg>
   );
 
-  const SocialButton = ({ href, label, iconPath }) => (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-6 py-3 border border-white/10 bg-zinc-900/50 rounded hover:bg-zinc-800 hover:border-yellow-400 transition-all group">
+  const SocialButton = ({ href, label, iconPath, download }) => (
+    <a href={href} target={download ? "_self" : "_blank"} rel="noopener noreferrer" download={download} className="flex items-center gap-3 px-6 py-3 border border-white/10 bg-zinc-900/50 rounded hover:bg-zinc-800 hover:border-yellow-400 transition-all group">
       <svg className="w-5 h-5 fill-current text-white group-hover:text-yellow-400 transition-colors" viewBox="0 0 24 24">
         {iconPath}
       </svg>
@@ -151,7 +171,7 @@ const AboutMeContent = () => {
         <div className="mb-8 border-l-2 border-yellow-400 pl-6">
           <p className="text-gray-300 font-['Rajdhani'] text-lg md:text-xl leading-relaxed md:max-w-2xl">
             I am a <span className="text-white font-bold">passionate AI and Fullstack Engineer</span> with deep knowledge in AI development.
-            Majority of my projects are done solo, allowing me to master modern web development, mobile development, and automation.
+            Majority of my projects are done solo, allowing me to master modern web development, AI development, and AI automation.
             I dabble a lot in exploring new technologies and frameworks, never staying stagnant.
           </p>
         </div>
@@ -209,6 +229,12 @@ const AboutMeContent = () => {
 
         {/* Social Buttons */}
         <div className="flex flex-wrap gap-4">
+          <SocialButton
+            href="/resume.pdf"
+            download="Frederick_Aranico_Resume.pdf"
+            label="RESUME"
+            iconPath={<path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />}
+          />
           <SocialButton
             href="https://github.com/Ennsss"
             label="GITHUB"
@@ -344,30 +370,71 @@ const DataRing = () => {
   );
 };
 
-// --- PROJECTS OVERLAY (Updated for Mobile HTML + Desktop 3D) ---
-const ProjectsOverlay = () => (
-  <Section align="center" justify="start">
-    <div className="mt-10 md:mt-10 text-center pointer-events-none z-10 w-full">
-      <h2 className="text-4xl md:text-6xl font-black text-cyan-400 mb-2 tracking-tighter font-['Orbitron'] drop-shadow-lg">PROJECTS</h2>
-      <p className="text-white font-mono text-xs md:text-sm tracking-[0.3em] uppercase font-['Rajdhani'] animate-pulse mb-8">&lt; {window.innerWidth < 768 ? 'MOBILE ARCHIVE' : 'GLOBAL DATA RING'} DETECTED /&gt;</p>
+// --- PROJECTS OVERLAY (Planet Left / List Right V2) ---
+const ProjectsOverlay = () => {
+  // Colors for the project list accents, matching the reference vibe
+  const accents = [
+    { border: 'border-yellow-400', text: 'text-yellow-400', bg: 'hover:bg-yellow-400/10' },
+    { border: 'border-red-400', text: 'text-red-400', bg: 'hover:bg-red-400/10' },
+    { border: 'border-blue-400', text: 'text-blue-400', bg: 'hover:bg-blue-400/10' },
+    { border: 'border-green-400', text: 'text-green-400', bg: 'hover:bg-green-400/10' },
+  ];
 
-      {/* MOBILE PROJECT CARDS (Visible only on mobile) */}
-      <div className="flex flex-col gap-4 pointer-events-auto md:hidden w-full pb-20">
-        {PROJECT_DATA.map((project, idx) => (
-          <a key={idx} href={project.link} target="_blank" rel="noopener noreferrer" className="bg-zinc-900/90 border border-cyan-500/30 p-5 rounded-lg text-left shadow-[0_0_15px_rgba(0,0,0,0.5)] active:scale-95 transition-transform">
-            <h3 className="text-xl font-bold text-cyan-400 font-['Orbitron'] mb-2">{project.title}</h3>
-            <p className="text-gray-300 text-sm font-['Rajdhani'] mb-3">{project.desc}</p>
-            <div className="flex flex-wrap gap-2">
-              {project.tech.map((t, i) => (
-                <span key={i} className="text-[10px] bg-cyan-900/50 text-cyan-200 px-2 py-1 rounded border border-cyan-500/20">{t}</span>
-              ))}
-            </div>
-          </a>
-        ))}
+  return (
+    <Section align="left">
+      <div className="w-[100%] ml-auto flex flex-col items-start z-10 pointer-events-none pl-10">
+        {/* Header */}
+        <div className="mb-8 pl-4 border-l-2 border-white/20">
+          <h2 className="text-5xl md:text-6xl font-black text-white mb-1 tracking-tighter font-['Orbitron']">PROJECTS</h2>
+          <div className="flex items-center gap-3 text-cyan-400 font-mono text-xs md:text-sm tracking-[0.3em] uppercase font-['Rajdhani']">
+            <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
+            ARCHIVE STATUS: UNLOCKED
+          </div>
+        </div>
+
+        {/* List Container */}
+        <div className="w-full flex flex-col gap-4 pointer-events-auto pr-4 md:pr-0 pb-20 md:pb-0 overflow-y-auto max-h-[60vh] md:max-h-none scrollbar-hide">
+          {PROJECT_DATA.map((project, idx) => {
+            const accent = accents[idx % accents.length];
+            return (
+              <a key={idx} href={project.link} target="_blank" rel="noopener noreferrer" className={`group relative w-full p-6 transition-all duration-500 hover:translate-x-2 md:hover:-translate-x-2 cursor-pointer bg-zinc-900/40 backdrop-blur-sm border-r-0 md:border-r-[1px] border-white/5`}>
+                {/* Hover Gradient & Border */}
+                <div className={`absolute inset-0 bg-gradient-to-r from-transparent to-white/5 -skew-x-12 border-l-4 ${accent.border} ${accent.bg} transition-colors duration-300 opacity-0 group-hover:opacity-100`}></div>
+
+                {/* Static Border (Normal State) */}
+                <div className={`absolute left-0 top-0 bottom-0 w-1 bg-white/10 group-hover:opacity-0 transition-opacity`}></div>
+
+                <div className="relative flex flex-col gap-2">
+                  {/* Title Row */}
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-white/20 font-['Rajdhani'] font-bold text-lg">0{idx + 1} //</span>
+                    <h3 className={`text-2xl md:text-3xl font-bold font-['Orbitron'] ${accent.text} group-hover:text-white transition-colors tracking-wide`}>
+                      {project.title.toUpperCase()}
+                    </h3>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-gray-400 text-sm font-['Rajdhani'] leading-relaxed max-w-xl group-hover:text-gray-300 transition-colors">
+                    {project.desc}
+                  </p>
+
+                  {/* Tech Stack */}
+                  <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
+                    {project.tech.map((t, i) => (
+                      <span key={i} className={`text-[10px] md:text-xs font-bold ${accent.text} font-['Orbitron'] tracking-wider group-hover:text-cyan-300 transition-colors`}>
+                        • {t.toUpperCase()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  </Section>
-);
+    </Section>
+  );
+};
 
 // --- EXPERIENCE SECTION ---
 const ExperienceContent = () => {
@@ -491,7 +558,7 @@ const CameraRig = () => {
     const scrollOffset = scroll.offset;
     const transitionPhase = THREE.MathUtils.clamp(scrollOffset * 3, 0, 1);
     const startPos = new THREE.Vector3(0, 20, 25);
-    const endPos = new THREE.Vector3(0, 13, 20);
+    const endPos = new THREE.Vector3(0, 0, 20);
     state.camera.position.lerpVectors(startPos, endPos, transitionPhase);
     state.camera.lookAt(0, 0, 0);
   });
@@ -543,7 +610,7 @@ const ContentPlanets = () => {
   const planets = useMemo(() => [
     { name: "Mercury", scale: 54, position: [xOffset, -viewport.height * 1, 0] },
     { name: "Venus", scale: 35, position: [-xOffset, -viewport.height * 2, 0] },
-    { name: "Earth", scale: 0.45, position: [0, -viewport.height * 3, 0] },
+    { name: "Earth", scale: 0.45, position: [xOffset, -viewport.height * 3, 0] },
     { name: "Mars", scale: 34, position: [-xOffset, -viewport.height * 4, 0] },
   ], [viewport, xOffset]);
 
@@ -562,9 +629,7 @@ const ContentPlanets = () => {
         <group key={i} position={p.position}>
           <Planet name={p.name} scale={p.scale} rotationSpeed={0.01} onPlanetClick={playClick} />
           <pointLight distance={10} intensity={4} color="white" />
-
-          {/* CONDITIONALLY RENDER DATA RING: Only if Earth AND NOT Mobile */}
-          {p.name === 'Earth' && !isMobile && <DataRing />}
+          {/* DataRing removed as requested */}
         </group>
       ))}
     </group>
