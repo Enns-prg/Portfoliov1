@@ -210,7 +210,7 @@ const AboutMeContent = () => {
             <div>
               <div className="text-[10px] tracking-widest text-gray-500 font-['Orbitron'] uppercase">STATUS</div>
               <div className="text-xl font-bold font-['Rajdhani']">Student</div>
-              <div className="text-xs text-gray-400 font-['Rajdhani']">Saint Louis University</div>
+              <div className="text-xs text-gray-400 font-['Rajdhani']">Adamson University</div>
             </div>
           </div>
 
