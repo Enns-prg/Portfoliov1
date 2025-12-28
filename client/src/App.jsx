@@ -47,7 +47,7 @@ const SoundController = () => {
 
   return (
     <div className="fixed top-6 left-6 z-50">
-      <button 
+      <button
         onClick={toggleSound}
         className="p-3 bg-zinc-900/80 backdrop-blur-md border border-white/20 rounded-full hover:bg-zinc-800 hover:border-yellow-400 transition-all duration-300 group shadow-[0_0_15px_rgba(0,0,0,0.5)]"
       >
@@ -63,13 +63,11 @@ const SoundController = () => {
 
 // --- HTML SECTIONS HELPER ---
 const Section = ({ align = 'left', justify = 'center', children }) => (
-  <div className={`h-screen w-screen flex flex-col px-6 md:px-20 relative pointer-events-none ${
-    align === 'right' ? 'items-center md:items-end' : 
+  <div className={`h-screen w-screen flex flex-col px-6 md:px-20 relative pointer-events-none ${align === 'right' ? 'items-center md:items-end' :
     align === 'left' ? 'items-center md:items-start' : 'items-center'
-  } ${
-    justify === 'center' ? 'justify-center' : 
-    justify === 'start' ? 'justify-start' : 'justify-end'
-  }`}>
+    } ${justify === 'center' ? 'justify-center' :
+      justify === 'start' ? 'justify-start' : 'justify-end'
+    }`}>
     <div className="pointer-events-auto w-full md:w-auto">
       {children}
     </div>
@@ -81,15 +79,15 @@ const HeroSection = () => {
   const [typingDone, setTypingDone] = useState(false);
   return (
     <Section align="left" justify="center">
-      <div className="z-10 select-none mt-[-10vh] text-center md:text-left"> 
+      <div className="z-10 select-none mt-[-10vh] text-center md:text-left">
         <div className={`transition-opacity duration-1000 ${typingDone ? 'opacity-100' : 'opacity-0'} animate-bounce text-yellow-400 mb-4 opacity-80`}>
-            <p className="text-xs mb-1 tracking-widest font-['Orbitron']">SCROLL TO ENTER</p>
-            <span className="text-xl">▼</span>
+          <p className="text-xs mb-1 tracking-widest font-['Orbitron']">SCROLL TO ENTER</p>
+          <span className="text-xl">▼</span>
         </div>
         <div className="mb-4 min-h-[3rem]">
-           <div className="text-4xl md:text-6xl font-bold text-white mb-2 tracking-tighter font-['Orbitron']">
-             <Typewriter text="Frederick Ian Aranico" delay={100} infinite={true} onComplete={() => setTypingDone(true)} />
-           </div>
+          <div className="text-4xl md:text-6xl font-bold text-white mb-2 tracking-tighter font-['Orbitron']">
+            <Typewriter text="Frederick Ian Aranico" delay={100} infinite={true} onComplete={() => setTypingDone(true)} />
+          </div>
         </div>
         <div className={`transition-opacity duration-1000 ${typingDone ? 'opacity-100' : 'opacity-0'}`}>
           <p className="text-gray-300 font-light tracking-widest uppercase text-lg border-l-2 border-yellow-400 pl-4 font-['Rajdhani'] inline-block md:block">Full Stack Developer</p>
@@ -101,47 +99,128 @@ const HeroSection = () => {
 
 // --- ABOUT ME SECTION ---
 const AboutMeContent = () => {
-  const ChipButton = ({ href, download, color, label, logo, index, accentColor }) => (
-    <a href={href} download={download} target={download ? "_self" : "_blank"} rel="noopener noreferrer" className="group relative w-full md:w-fit h-[50px] bg-zinc-900/80 md:-skew-x-12 border-l-4 border-white/20 flex items-center pr-6 pl-4 transition-all duration-300 hover:bg-zinc-800 hover:border-yellow-400 md:hover:skew-x-0 md:hover:translate-x-2">
-      <div className={`absolute left-0 top-0 bottom-0 w-1 ${accentColor} transition-all duration-300 group-hover:w-2 group-hover:shadow-[0_0_15px_currentColor]`}></div>
-      <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-start"> 
-        <div className="flex items-center gap-3">
-          <div className="relative w-7 h-7 flex items-center justify-center bg-black/50 rounded p-1 border border-white/5">
-             <img src={logo} alt={label} className={`w-full h-full object-contain ${label === 'GITHUB' ? 'invert' : ''} opacity-70 group-hover:opacity-100 transition-opacity`} />
-          </div>
-          <div className="flex flex-col">
-            <span className={`text-sm font-bold font-['Orbitron'] tracking-widest ${color} group-hover:brightness-125 transition-all`}>{label}</span>
-          </div>
-        </div>
-        <div className="hidden md:block text-right">
-          <span className="text-[2rem] leading-none font-bold font-['Rajdhani'] text-white/5 group-hover:text-white/10 transition-colors">0{index}</span>
-        </div>
-      </div>
+  // Simple Icons as components for reusability in this section
+  const IconPin = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+    </svg>
+  );
+
+  const IconClock = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+
+  const IconAcademic = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.499 5.24 50.552 50.552 0 00-2.658.813m-15.482 0A50.55 50.55 0 0112 13.489a50.55 50.55 0 016.744-3.342M14.25 14.25h-4.5v4.5h4.5v-4.5z" />
+    </svg>
+  );
+
+  const IconCode = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+    </svg>
+  );
+
+  const SocialButton = ({ href, label, iconPath }) => (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-6 py-3 border border-white/10 bg-zinc-900/50 rounded hover:bg-zinc-800 hover:border-yellow-400 transition-all group">
+      <svg className="w-5 h-5 fill-current text-white group-hover:text-yellow-400 transition-colors" viewBox="0 0 24 24">
+        {iconPath}
+      </svg>
+      <span className="font-['Orbitron'] text-sm tracking-widest text-white group-hover:text-yellow-400 transition-colors">{label}</span>
     </a>
   );
 
   return (
     <Section align="left">
-      <div className="w-full md:w-[50%] lg:w-[45%] text-white mt-[-2rem] md:mt-[-5rem] z-10 flex flex-col items-center md:items-start">
-        <div className="relative mb-6 md:mb-8 group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-full opacity-30 blur-md group-hover:opacity-70 transition duration-500"></div>    
-          <img 
-            src="/assets/images/me.jpg" 
-            alt="Frederick Ian Aranico" 
-            className="relative w-32 h-32 md:w-48 md:h-48 rounded-full border-2 border-yellow-100/50 object-cover shadow-2xl" 
+      <div className="w-full md:w-[90%] lg:w-[80%] text-white mt-[-2rem] md:mt-[-5rem] z-10 flex flex-col items-start">
+
+        {/* Header Section */}
+        <div className="mb-8">
+          <h4 className="text-yellow-400 font-['Orbitron'] tracking-[0.2em] text-sm mb-2 border-b border-yellow-400/30 inline-block pb-1">ABOUT_ME</h4>
+          <h1 className="text-5xl md:text-7xl font-black font-['Orbitron'] leading-none mb-2">HELLO.</h1>
+          <h2 className="text-2xl md:text-4xl text-gray-400 font-['Orbitron'] uppercase">
+            I AM <span className="text-white">FREDERICK IAN ARANICO</span>
+          </h2>
+        </div>
+
+        {/* Bio Text */}
+        <div className="mb-8 border-l-2 border-yellow-400 pl-6">
+          <p className="text-gray-300 font-['Rajdhani'] text-lg md:text-xl leading-relaxed md:max-w-2xl">
+            I am a <span className="text-white font-bold">passionate AI and Fullstack Engineer</span> with deep knowledge in AI development.
+            Majority of my projects are done solo, allowing me to master modern web development, mobile development, and automation.
+            I dabble a lot in exploring new technologies and frameworks, never staying stagnant.
+          </p>
+        </div>
+
+        {/* Grid Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mb-8">
+          {/* Location */}
+          <div className="bg-zinc-900/50 border border-white/10 p-4 rounded flex items-center gap-4 hover:border-yellow-400 transition-colors group">
+            <div className="p-3 rounded-full bg-white/5 text-yellow-400 group-hover:text-white transition-colors">
+              <IconPin />
+            </div>
+            <div>
+              <div className="text-[10px] tracking-widest text-gray-500 font-['Orbitron'] uppercase">BASE OF OPERATIONS</div>
+              <div className="text-xl font-bold font-['Rajdhani']">Taguig, PH</div>
+              <div className="text-xs text-gray-400 font-['Rajdhani']">Metro Manila</div>
+            </div>
+          </div>
+
+          {/* Timezone */}
+          <div className="bg-zinc-900/50 border border-white/10 p-4 rounded flex items-center gap-4 hover:border-yellow-400 transition-colors group">
+            <div className="p-3 rounded-full bg-white/5 text-yellow-400 group-hover:text-white transition-colors">
+              <IconClock />
+            </div>
+            <div>
+              <div className="text-[10px] tracking-widest text-gray-500 font-['Orbitron'] uppercase">TIMEZONE</div>
+              <div className="text-xl font-bold font-['Rajdhani']">GMT +8</div>
+              <div className="text-xs text-gray-400 font-['Rajdhani']">Philippine Standard Time</div>
+            </div>
+          </div>
+
+          {/* Status */}
+          <div className="bg-zinc-900/50 border border-white/10 p-4 rounded flex items-center gap-4 hover:border-yellow-400 transition-colors group">
+            <div className="p-3 rounded-full bg-white/5 text-yellow-400 group-hover:text-white transition-colors">
+              <IconAcademic />
+            </div>
+            <div>
+              <div className="text-[10px] tracking-widest text-gray-500 font-['Orbitron'] uppercase">STATUS</div>
+              <div className="text-xl font-bold font-['Rajdhani']">Student</div>
+              <div className="text-xs text-gray-400 font-['Rajdhani']">Saint Louis University</div>
+            </div>
+          </div>
+
+          {/* Focus */}
+          <div className="bg-zinc-900/50 border border-white/10 p-4 rounded flex items-center gap-4 hover:border-yellow-400 transition-colors group">
+            <div className="p-3 rounded-full bg-white/5 text-yellow-400 group-hover:text-white transition-colors">
+              <IconCode />
+            </div>
+            <div>
+              <div className="text-[10px] tracking-widest text-gray-500 font-['Orbitron'] uppercase">FOCUS</div>
+              <div className="text-xl font-bold font-['Rajdhani']">AI & Full Stack</div>
+              <div className="text-xs text-gray-400 font-['Rajdhani']">Jack of All Trades</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Social Buttons */}
+        <div className="flex flex-wrap gap-4">
+          <SocialButton
+            href="https://github.com/Ennsss"
+            label="GITHUB"
+            iconPath={<path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />}
+          />
+          <SocialButton
+            href="https://www.linkedin.com/in/frederickaranico/"
+            label="LINKEDIN"
+            iconPath={<path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />}
           />
         </div>
-        <h3 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6 font-['Orbitron'] tracking-wide text-center md:text-left">
-          ABOUT ME
-        </h3>
-        <p className="text-sm md:text-xl leading-relaxed text-gray-300 mb-6 md:mb-8 font-['Rajdhani'] text-center md:text-justify">
-         Hi! I’m Frederick Ian Aranico, a Computer Science student and aspiring AI engineer with a strong focus on building practical, data-driven, and AI-powered applications.
-        </p>
-        <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-          <ChipButton href="/resume.pdf" download={true} label="RESUME" color="text-yellow-400" accentColor="bg-yellow-400" logo="/assets/logos/resume.png" index={1} />
-          <ChipButton href="https://github.com/Ennsss" label="GITHUB" color="text-gray-200" accentColor="bg-white" logo="/assets/logos/github.png" index={2} />
-          <ChipButton href="https://www.linkedin.com/in/frederickaranico/" label="LINKEDIN" color="text-blue-400" accentColor="bg-blue-500" logo="/assets/logos/linkedin.jpg" index={3} />
-        </div>
+
       </div>
     </Section>
   );
@@ -162,8 +241,8 @@ const SkillsContent = () => {
         <div className="mb-10 pl-4 border-l-2 border-white/20">
           <h2 className="text-6xl font-black text-white mb-1 tracking-tighter font-['Orbitron']"> SKILLS</h2>
           <div className="flex items-center gap-3 text-gray-400 font-mono text-sm tracking-[0.3em] uppercase font-tech">
-             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-             System Status: Online
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            System Status: Online
           </div>
         </div>
         <div className="w-full flex flex-col gap-6 pointer-events-auto">
@@ -194,12 +273,12 @@ const SkillsContent = () => {
 const ScanningSatellite = ({ position, rotation, project, setFocusTarget }) => {
   const [hovered, setHover] = useState(false);
   const scanBarRef = useRef();
-  
+
   useFrame((state) => {
     if (scanBarRef.current) {
       if (hovered) {
         const time = state.clock.elapsedTime * 2;
-        scanBarRef.current.position.y = Math.sin(time) * 1.2; 
+        scanBarRef.current.position.y = Math.sin(time) * 1.2;
         scanBarRef.current.visible = true;
       } else {
         scanBarRef.current.visible = false;
@@ -229,14 +308,14 @@ const ScanningSatellite = ({ position, rotation, project, setFocusTarget }) => {
           <RoundedBox args={[bodyW, bodyH, bodyD]} radius={0.1} smoothness={4}>
             <meshPhysicalMaterial color={hovered ? "#0f172a" : "#000000"} roughness={0.2} metalness={0.8} transmission={0.5} transparent opacity={0.8} thickness={0.5} />
           </RoundedBox>
-          <mesh ref={scanBarRef} position={[0, 0, bodyD/2 + 0.05]} visible={false}>
-             <boxGeometry args={[bodyW + 0.2, 0.05, 0.05]} />
-             <meshBasicMaterial color="#00ffff" />
+          <mesh ref={scanBarRef} position={[0, 0, bodyD / 2 + 0.05]} visible={false}>
+            <boxGeometry args={[bodyW + 0.2, 0.05, 0.05]} />
+            <meshBasicMaterial color="#00ffff" />
           </mesh>
-          <group position={[0, 0, bodyD/2 + 0.02]}>
-            <Text position={[-bodyW/2 + 0.2, 1, 0]} fontSize={0.32} color="#38bdf8" anchorX="middle" anchorY="left" font={fontTitle}>{project.title.toUpperCase()}</Text>
-            <Text position={[-bodyW/2 + 0.5, 0.25, 0]} fontSize={0.2} color="#cbd5e1" anchorX="left" anchorY="middle" maxWidth={bodyW - 0.8} lineHeight={1.4} font={fontBody}>{project.desc}</Text>
-            <Text position={[-bodyW/2 + 0.3, -bodyH/2 + 0.3, 0]} fontSize={0.25} color="#facc15" anchorX="left" anchorY="bottom" font={fontTitle}>CLICK TO VIEW →</Text>
+          <group position={[0, 0, bodyD / 2 + 0.02]}>
+            <Text position={[-bodyW / 2 + 0.2, 1, 0]} fontSize={0.32} color="#38bdf8" anchorX="middle" anchorY="left" font={fontTitle}>{project.title.toUpperCase()}</Text>
+            <Text position={[-bodyW / 2 + 0.5, 0.25, 0]} fontSize={0.2} color="#cbd5e1" anchorX="left" anchorY="middle" maxWidth={bodyW - 0.8} lineHeight={1.4} font={fontBody}>{project.desc}</Text>
+            <Text position={[-bodyW / 2 + 0.3, -bodyH / 2 + 0.3, 0]} fontSize={0.25} color="#facc15" anchorX="left" anchorY="bottom" font={fontTitle}>CLICK TO VIEW →</Text>
           </group>
         </group>
       </Billboard>
@@ -247,10 +326,10 @@ const ScanningSatellite = ({ position, rotation, project, setFocusTarget }) => {
 const DataRing = () => {
   const groupRef = useRef();
   useFrame(() => { if (groupRef.current) groupRef.current.rotation.y += 0.002; });
-  const radius = 8; 
+  const radius = 8;
 
   return (
-    <group ref={groupRef} rotation={[-0, 20, -10]}> 
+    <group ref={groupRef} rotation={[-0, 20, -10]}>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[radius - 0.05, radius + 0.05, 128]} />
         <meshBasicMaterial color="#38bdf8" side={THREE.DoubleSide} transparent opacity={0.15} />
@@ -271,7 +350,7 @@ const ProjectsOverlay = () => (
     <div className="mt-10 md:mt-10 text-center pointer-events-none z-10 w-full">
       <h2 className="text-4xl md:text-6xl font-black text-cyan-400 mb-2 tracking-tighter font-['Orbitron'] drop-shadow-lg">PROJECTS</h2>
       <p className="text-white font-mono text-xs md:text-sm tracking-[0.3em] uppercase font-['Rajdhani'] animate-pulse mb-8">&lt; {window.innerWidth < 768 ? 'MOBILE ARCHIVE' : 'GLOBAL DATA RING'} DETECTED /&gt;</p>
-      
+
       {/* MOBILE PROJECT CARDS (Visible only on mobile) */}
       <div className="flex flex-col gap-4 pointer-events-auto md:hidden w-full pb-20">
         {PROJECT_DATA.map((project, idx) => (
@@ -371,10 +450,10 @@ const ContactSection = () => {
         ) : (
           /* Contact Form */
           <form onSubmit={handleSubmit} className="flex flex-col gap-3 md:gap-4 bg-zinc-900/80 p-5 md:p-8 rounded-lg border border-white/10 backdrop-blur-md shadow-2xl relative mx-2 md:mx-0">
-             <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/30"></div>
-             <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/30"></div>
-             <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white/30"></div>
-             <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/30"></div>
+            <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/30"></div>
+            <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/30"></div>
+            <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white/30"></div>
+            <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/30"></div>
 
             <div className="flex flex-col gap-1">
               <label htmlFor="name" className="text-yellow-400 font-['Orbitron'] text-[10px] md:text-xs tracking-widest">IDENTITY</label>
@@ -409,10 +488,10 @@ const ContactSection = () => {
 const CameraRig = () => {
   const scroll = useScroll();
   useFrame((state) => {
-    const scrollOffset = scroll.offset; 
+    const scrollOffset = scroll.offset;
     const transitionPhase = THREE.MathUtils.clamp(scrollOffset * 3, 0, 1);
     const startPos = new THREE.Vector3(0, 20, 25);
-    const endPos = new THREE.Vector3(0, 13, 20); 
+    const endPos = new THREE.Vector3(0, 13, 20);
     state.camera.position.lerpVectors(startPos, endPos, transitionPhase);
     state.camera.lookAt(0, 0, 0);
   });
@@ -424,9 +503,9 @@ const HeroSolarSystem = () => {
   const solarSystemRef = useRef();
   useFrame(() => {
     if (solarSystemRef.current) {
-      solarSystemRef.current.rotation.y += 0.001; 
+      solarSystemRef.current.rotation.y += 0.001;
       const scrollOffset = scroll.offset;
-      const targetY = scrollOffset > 0.01 ? 50 : -2; 
+      const targetY = scrollOffset > 0.01 ? 50 : -2;
       solarSystemRef.current.position.y = THREE.MathUtils.lerp(
         solarSystemRef.current.position.y, targetY, 0.05
       );
@@ -448,10 +527,10 @@ const HeroSolarSystem = () => {
 // --- MODIFIED CONTENT PLANETS ---
 const ContentPlanets = () => {
   const { viewport, size } = useThree(); // 'size' gives the canvas dimensions in pixels
-  const scroll = useScroll(); 
+  const scroll = useScroll();
   const groupRef = useRef();
-  const xOffset = viewport.width / 10; 
-  
+  const xOffset = viewport.width / 10;
+
   // CHECK FOR MOBILE DEVICE (Width < 768px)
   const isMobile = size.width < 768;
 
@@ -463,9 +542,9 @@ const ContentPlanets = () => {
 
   const planets = useMemo(() => [
     { name: "Mercury", scale: 54, position: [xOffset, -viewport.height * 1, 0] },
-    { name: "Venus",   scale: 35, position: [-xOffset, -viewport.height * 2, 0] },
-    { name: "Earth",   scale: 0.45, position: [0, -viewport.height * 3, 0] }, 
-    { name: "Mars",    scale: 34, position: [-xOffset, -viewport.height * 4, 0] },
+    { name: "Venus", scale: 35, position: [-xOffset, -viewport.height * 2, 0] },
+    { name: "Earth", scale: 0.45, position: [0, -viewport.height * 3, 0] },
+    { name: "Mars", scale: 34, position: [-xOffset, -viewport.height * 4, 0] },
   ], [viewport, xOffset]);
 
   useFrame(() => {
@@ -483,7 +562,7 @@ const ContentPlanets = () => {
         <group key={i} position={p.position}>
           <Planet name={p.name} scale={p.scale} rotationSpeed={0.01} onPlanetClick={playClick} />
           <pointLight distance={10} intensity={4} color="white" />
-          
+
           {/* CONDITIONALLY RENDER DATA RING: Only if Earth AND NOT Mobile */}
           {p.name === 'Earth' && !isMobile && <DataRing />}
         </group>
